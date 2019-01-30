@@ -6,11 +6,15 @@ module AeEasy
 
       alias :collection :config_collection
 
-      def initialize_hook_config opts
-        @config_collection = collection unless opts[:collection].nil?
-      end
-
+      # Initialize config object
+      #
+      # @param [Hash] opts ({}) Configuration options.
+      #
+      # @see AeEasy::Core::Plugin::ConfigBehavior#initialize_hook_core_config_behavior
       def initialize opts = {}
+        opts = opts.merge(
+          config_collection: opts[:collection]
+        )
         initialize_hooks opts
       end
     end

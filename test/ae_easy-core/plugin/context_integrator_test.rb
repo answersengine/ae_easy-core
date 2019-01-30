@@ -23,7 +23,7 @@ describe 'context integrator' do
       class << source
         define_method :my_test, lambda{|text|"hello world #{text}"}
       end
-      @object.initialize_hook_context_integrator context: source
+      @object.initialize_hook_core_context_integrator context: source
       assert_equal @object.my_test('test'), 'hello world test'
     end
   end

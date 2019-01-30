@@ -7,7 +7,7 @@ PATH
 PATH
   remote: /var/www/html/app/core/answersengine
   specs:
-    answersengine (0.2.25)
+    answersengine (0.2.29)
       httparty (~> 0.16.2)
       nokogiri (~> 1.6, < 1.10)
       thor (~> 0.20.3)

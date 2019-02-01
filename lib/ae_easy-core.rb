@@ -193,6 +193,48 @@ module AeEasy
           is_compatible: (intersection.count == fragment.count)
         }
       end
+
+      # Deep stringify keys from a hash.
+      #
+      # @param [Hash] hash Source hash to stringify keys.
+      # @param [Boolean] clone (true) Target a hash clone to avoid affecting the same hash object.
+      #
+      # @return [Hash]
+      def deep_stringify_keys hash, clone = true
+        pair_collection = hash.map{|k,v| [k.to_s,v]}
+        target = opts[:apply_into] ? hash : {}
+        target.clear
+        pair_collection.each do |pair|
+          key, value = pair
+          target[key] = value.is_a?(Hash) ? deep_stringify_keys(value) : value
+        end
+        target
+      end
+
+      # Deep stringify all keys on hash object.
+      #
+      # @param [Hash] hash Hash to stringify keys.
+      #
+      # @returh [Hash]
+      def deep_stringify_keys! hash
+        deep_stringify_keys hash, true
+      end
+
+      # Deep clone a hash while keeping it's values object references.
+      #
+      # @param [Hash] hash Hash to clone.
+      # @param [Boolean] should_clone (false) Clone values when true.
+      #
+      # @return [Hash] Hash clone.
+      def deep_clone hash, should_clone = false
+        target = {}
+        hash.each do |key, value|
+          value = value.is_a?(Hash) ? deep_clone(value) : value
+          value = value.clone if should_clone
+          target[key] = value
+        end
+        target
+      end
     end
   end
 end

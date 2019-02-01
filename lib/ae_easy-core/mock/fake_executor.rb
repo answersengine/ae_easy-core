@@ -1,20 +1,12 @@
 module AeEasy
   module Core
     module Mock
+      # Fake exector that emulates `AnswersEngine` executor.
       class FakeExecutor
-        # Page id keys, analog to primary keys.
-        PAGE_KEYS = ['_id', '_collection'].freeze
-        # Output id keys, analog to primary keys.
-        OUTPUT_KEYS = ['_gid'].freeze
-        # Default collection for saved outputs
-        DEFAULT_COLLECTION = 'default'
-
         # Page content as string.
         attr_accessor :content
         # Failed page content as string.
         attr_accessor :failed_content
-        # Fake database to represent what it is saved.
-        attr_reader :db
         # Draft pages, usually get saved after execution.
         attr_reader :pages
         # Draft outputs, usually get saved after execution.
@@ -22,56 +14,23 @@ module AeEasy
 
         include AnswersEngine::Plugin::ContextExposer
 
-        # Generate a fake UUID.
-        def self.fake_uuid
-          seed = (Time.new.to_f + rand)
-          Digest::SHA1.hexdigest seed.to_s
-        end
-
-        # Generate a smart collection with keys and initial values.
-        #
-        # @param [Array] keys Analog to primary keys, combination will be uniq.
-        # @param [Array,nil] values (nil) Collection initial array.
-        #
-        # @return [AeEasy::Core::SmartCollection]
-        def self.new_collection keys, values = nil
-          AeEasy::Core::SmartCollection.new keys, values
-        end
-
         # Remove all elements on pages.
         # @private
         def clear_draft_pages
-          @pages = self.class.new_collection PAGE_KEYS
+          @pages ||= []
+          @pages.clear
         end
 
         # Remove all elements on outputs.
         # @private
         def clear_draft_outputs
-          @outputs = self.class.new_collection OUTPUT_KEYS
+          @outputs ||= []
+          @outputs.clear
         end
 
-        # Get page keys with key generators to emulate saving on db.
-        # @private
-        #
-        # @return [Hash]
-        def db_page_keys
-          @db_page_keys ||= Hash[PAGE_KEYS.map{|k|[k, nil]}].merge(
-            'gid' => lambda{self.class.fake_uuid}
-          )
-        end
-
-        # Get output keys with key generators to emulate saving on db.
-        # @private
-        #
-        # @return [Hash]
-        def db_output_keys
-          @db_output_keys ||= Hash[PAGE_KEYS.map{|k|[k, nil]}].merge(
-            '_id': lambda{self.class.fake_uuid},
-            '_collection': DEFAULT_COLLECTION,
-            '_job_id': lambda{job_id},
-            '_created_at': lambda{Time.new.strftime('%Y-%m-%dT%H:%M:%SZ')},
-            '_gid': lambda{page.nil? ? nil : page['gid']}
-          )
+        # Fake database to represent what it is saved.
+        def db
+          @db ||= AeEasy::Core::Mock::FakeDb.new
         end
 
         # Initialize object.
@@ -81,10 +40,6 @@ module AeEasy
         # @option opts [Array] :outputs (nil) Array to initialize outputs, can be nil for empty.
         # @option opts [Integer] :job_id (nil) A number to represent the job_id.
         def initialize opts = {}
-          @db = {
-            pages: self.class.new_collection(db_page_keys, opts[:pages]),
-            outputs: self.class.new_collection(db_output_keys, opts[:outputs])
-          }
           job_id = opts[:job_id]
           clear_draft_pages
           clear_draft_outputs
@@ -93,73 +48,49 @@ module AeEasy
         # Fake job ID used by executor.
         # @return [Integer,nil]
         def job_id
-          @job_id ||= rand(1000) + 1
+          db.job_id
         end
 
         # Set fake job id value.
         def job_id= value
-          @job_id = value
+          db.job_id = value
         end
 
         # Current page used by executor.
         # @return [Hash,nil]
         def page
-          @page
+          @page ||= AeEasy::Core::Mock::FakeDb.build_fake_page job_id: job_id
         end
 
         # Set current page.
         def page= value
-          job_id = page['job_id']
-          page['job_id'] = job_id if page['job_id'].nil?
-          @page = page
+          job_id = value['job_id']
+          value['job_id'] ||= job_id
+          @page = value
         end
 
         # Retrive a list of saved pages. Drafted pages can be included.
-        #
-        # @param [Hash] opts ({}) Save options.
-        # @option opts [Boolean] :include_draft (true) Specify if draft pages should be included.
-        def saved_pages opts = {}
-          opts = {
-            include_draft: true
-          }.merge opts
-          list = self.class.new_collection PAGE_KEYS
-          db[:pages].each{|item|list << item}
-          pages.each{|item|list << item} if opts[:include_draft]
-          list
+        def saved_pages
+          db.pages
         end
 
-        # Retrive a list of saved outputs. Drafted outputs can be included.
-        #
-        # @param [Hash] opts ({}) Save options.
-        # @option opts [Boolean] :include_draft (true) Include draft outputs when true.
-        def saved_outptus opts = {}
-          opts = {
-            include_draft: true
-          }.merge opts
-          list = self.class.new_collection OUTPUT_KEYS
-          db[:outputs].each{|item|list << item}
-          outputs.each{|item|list << item} if opts[:include_draft]
-          list
+        # Retrive a list of saved outputs.
+        def saved_outputs
+          db.outputs
         end
 
         # Save a page collection on db.
         #
         # @param [Array] list Collection of pages to save.
         def save_pages list
-          list.each{|page| db[:pages] << page}
+          list.each{|page| db.pages << page}
         end
 
         # Save an output collection on db.
         #
         # @param [Array] list Collection of outputs to save.
         def save_outputs list
-          list.each do |output|
-            db[:outputs] << {
-              '_gid': page.nil? ? nil : page['_gid'],
-              '_id': self.class.fake_uuid,
-              '_job_id': page.nil? ? nil : page['job_id'],
-            }.merge(output)
-          end
+          list.each{|output| db.outputs << output}
         end
 
         # Save draft pages into db and clear draft queue.
@@ -180,20 +111,6 @@ module AeEasy
           flush_outputs
         end
 
-        # Match data to filters.
-        # @private
-        #
-        # @param data Hash containing data.
-        # @param filters Filters to apply on match.
-        #
-        # @return [Boolean]
-        def match? data, filters
-          filters.each do |key, value|
-            return false if data[k] != v
-          end
-          true
-        end
-
         # Find outputs by collection and query with pagination.
         #
         # @param [String] collection ('default') Collection name.
@@ -202,22 +119,13 @@ module AeEasy
         # @param [Integer] per_page (30) Page size.
         #
         # @return [Array]
-        def find_outputs collection = 'default', query = {}, page = 1, per_page = 30
+        def find_outputs collection = 'default', raw_query = {}, page = 1, per_page = 30
           count = 0
           offset = (page - 1) * per_page
-          matches = []
-          db[:outputs].each do |output|
-            next unless match? output, filter
-
-            # Reach page
-            count += 1
-            next unless offset < count
-
-            # Break when page size reach
-            break unless matches.count < per_page
-            matches << output
-          end
-          matches
+          query = raw_query.merge(
+            '_collection' => collection
+          )
+          db.query :outputs, query, offset, per_page
         end
 
         # Find one output by collection and query with pagination.

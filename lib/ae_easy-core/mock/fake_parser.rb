@@ -1,6 +1,7 @@
 module AeEasy
   module Core
     module Mock
+      # Fake parser that emulates `AnswersEngine` parser executor.
       class FakeParser < FakeExecutor
         # Fake parser exposed methods to isolated context.
         # @private

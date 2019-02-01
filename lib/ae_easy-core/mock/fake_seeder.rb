@@ -1,6 +1,7 @@
 module AeEasy
   module Core
     module Mock
+      # Fake seeder that emulates `AnswersEngine` seeder executor.
       class FakeSeeder < FakeExecutor
         # Fake seeder exposed methods to isolated context.
         # @private

@@ -1,3 +1,4 @@
+require 'ae_easy-core/mock/fake_db'
 require 'ae_easy-core/mock/fake_executor'
 require 'ae_easy-core/mock/fake_parser'
 require 'ae_easy-core/mock/fake_seeder'

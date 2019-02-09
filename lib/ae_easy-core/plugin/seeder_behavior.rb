@@ -9,6 +9,12 @@ module AeEasy
           pages = [pages] unless pages.is_a? Array
           save_pages pages
         end
+
+        # {AeEasy::Core::Plugin::ParserBehavior#save}
+        def save outputs
+          outputs = [outputs] unless outputs.is_a? Array
+          save_outputs outputs
+        end
       end
     end
   end

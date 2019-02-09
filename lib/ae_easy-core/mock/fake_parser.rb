@@ -2,7 +2,9 @@ module AeEasy
   module Core
     module Mock
       # Fake parser that emulates `AnswersEngine` parser executor.
-      class FakeParser < FakeExecutor
+      class FakeParser
+        include AeEasy::Core::Mock::FakeExecutor
+
         # Fake parser exposed methods to isolated context.
         # @private
         #
@@ -20,7 +22,7 @@ module AeEasy
             :find_output,
             :find_outputs
           ].freeze
-          check_compatibility real_methods, mock_methods
+          AeEasy::Core::Mock::FakeExecutor.check_compatibility real_methods, mock_methods
           mock_methods
         end
       end

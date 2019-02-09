@@ -1,6 +1,7 @@
 require 'time'
 require 'answersengine'
 require 'ae_easy-core/smart_collection'
+require 'ae_easy-core/exception'
 require 'ae_easy-core/plugin'
 require 'ae_easy-core/helper'
 require 'ae_easy-core/config'
@@ -26,8 +27,8 @@ module AeEasy
       #
       # @yieldparam [String] path Script file path.
       def all_scripts dir, opts = {}, &block
-        excluded_files = opts[:except] || []
-        files = Dir[File.join(dir, '*.rb')] - excluded_files
+        excluded_files = (opts[:except] || []).map{|f|File.expand_path File.join(dir, f)}
+        files = Dir[File.join(File.expand_path(dir), '*.rb')] - excluded_files
         block ||= proc{}
         files.sort.each &block
       end
@@ -38,7 +39,15 @@ module AeEasy
       # @param [Hash] opts ({}) Configuration options.
       # @option opts [Array] :except (nil) Literal file collection excluded from process.
       def require_all dir, opts = {}
-        all_scripts(dir, opts) {|file| require file}
+        real_dir = options = nil
+        real_except = []
+        $LOAD_PATH.each do |load_path|
+          real_dir = File.join load_path, dir
+          next unless File.directory? real_dir
+          real_except = (opts[:except] || []).map{|f| "#{f}.rb"}
+          options = opts.merge except: real_except
+          all_scripts(real_dir, options) {|file| require file}
+        end
       end
 
       # Require all relative scripts paths within a directory.
@@ -47,16 +56,9 @@ module AeEasy
       # @param [Hash] opts ({}) Configuration options.
       # @option opts [Array] :except (nil) Literal file collection excluded from process.
       def require_relative_all dir, opts = {}
-        all_scripts(dir, opts) {|file| require_relative file}
-      end
-
-      # Include all scripts within a directory.
-      #
-      # @param [String] dir Directory containing `.rb` scripts.
-      # @param [Hash] opts ({}) Configuration options.
-      # @option opts [Array] :except (nil) Literal file collection excluded from process.
-      def include_all dir, opts = {}
-        all_scripts(dir, opts) {|file| include file}
+        real_except = (opts[:except] || []).map{|f| "#{f}.rb"}
+        options = opts.merge except: real_except
+        all_scripts(dir, options) {|file| require file}
       end
 
       # Expose an environment into an object instance as methods.
@@ -179,11 +181,11 @@ module AeEasy
       #   * `:is_compatible [Boolean]` true when all `fragment`'s methods are present on `source`.
       #
       # @example Analyze when uncompatible `fragment` because of `source` missing fields.
-      #   analyze_compatibility [1,2,3,4,5], [1,2,6]
+      #   AeEasy::Core.analyze_compatibility [1,2,3,4,5], [1,2,6]
       #   # => {missing: [6], new: [3,4,5], is_compatible: false}
       #
       # @example Analyze when compatible.
-      #   analyze_compatibility [1,2,3,4,5], [1,2,3]
+      #   AeEasy::Core.analyze_compatibility [1,2,3,4,5], [1,2,3]
       #   # => {missing: [], new: [4,5], is_compatible: true}
       def analyze_compatibility source, fragment
         intersection = source & fragment
@@ -197,16 +199,16 @@ module AeEasy
       # Deep stringify keys from a hash.
       #
       # @param [Hash] hash Source hash to stringify keys.
-      # @param [Boolean] clone (true) Target a hash clone to avoid affecting the same hash object.
+      # @param [Boolean] should_clone (true) Target a hash clone to avoid affecting the same hash object.
       #
       # @return [Hash]
-      def deep_stringify_keys hash, clone = true
+      def deep_stringify_keys hash, should_clone = true
         pair_collection = hash.map{|k,v| [k.to_s,v]}
-        target = opts[:apply_into] ? hash : {}
+        target = should_clone ? {} : hash
         target.clear
         pair_collection.each do |pair|
           key, value = pair
-          target[key] = value.is_a?(Hash) ? deep_stringify_keys(value) : value
+          target[key] = value.is_a?(Hash) ? deep_stringify_keys(value, should_clone) : value
         end
         target
       end
@@ -215,9 +217,9 @@ module AeEasy
       #
       # @param [Hash] hash Hash to stringify keys.
       #
-      # @returh [Hash]
+      # @return [Hash]
       def deep_stringify_keys! hash
-        deep_stringify_keys hash, true
+        deep_stringify_keys hash, false
       end
 
       # Deep clone a hash while keeping it's values object references.
@@ -229,8 +231,7 @@ module AeEasy
       def deep_clone hash, should_clone = false
         target = {}
         hash.each do |key, value|
-          value = value.is_a?(Hash) ? deep_clone(value) : value
-          value = value.clone if should_clone
+          value = value.is_a?(Hash) ? deep_clone(value, should_clone) : (should_clone ? value.clone : value)
           target[key] = value
         end
         target

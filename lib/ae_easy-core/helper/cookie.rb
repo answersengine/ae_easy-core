@@ -1,6 +1,7 @@
 module AeEasy
   module Core
     module Helper
+      # Helper used for lower level cookie management.
       class Cookie
         class << self
           # Parse request cookies on different formats.

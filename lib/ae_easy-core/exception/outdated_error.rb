@@ -1,7 +1,8 @@
 module AeEasy
   module Core
     module Exception
-      class OutdatedError < Exception
+      # Exception that indicates something is outdated error.
+      class OutdatedError < StandardError
       end
     end
   end

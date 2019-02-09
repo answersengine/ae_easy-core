@@ -2,7 +2,9 @@ module AeEasy
   module Core
     module Mock
       # Fake seeder that emulates `AnswersEngine` seeder executor.
-      class FakeSeeder < FakeExecutor
+      class FakeSeeder
+        include AeEasy::Core::Mock::FakeExecutor
+
         # Fake seeder exposed methods to isolated context.
         # @private
         #
@@ -10,10 +12,14 @@ module AeEasy
         def self.exposed_methods
           real_methods = AnswersEngine::Scraper::RubySeederExecutor.exposed_methods.uniq
           mock_methods = [
+            :outputs,
             :pages,
-            :save_pages
+            :save_pages,
+            :save_outputs,
+            :find_output,
+            :find_outputs
           ].freeze
-          check_compatibility real_methods, mock_methods
+          AeEasy::Core::Mock::FakeExecutor.check_compatibility real_methods, mock_methods
           mock_methods
         end
       end

@@ -8,7 +8,9 @@ describe 'seeder' do
       include AeEasy::Core::Plugin::Seeder
     end
 
-    @context, @message_queue = AeEasy::Core::Test::Helper.seeder_context_vars
+    # Seeder context
+    exposed_methods = AnswersEngine::Scraper::RubySeederExecutor.exposed_methods
+    @context, @message_queue = AeEasy::Core::Mock.context_vars exposed_methods
   end
 
   describe 'integration test' do

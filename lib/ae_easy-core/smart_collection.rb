@@ -1,6 +1,9 @@
 module AeEasy
   module Core
+    # Smart collection capable to avoid duplicates on insert by matching id
+    #   defined fields along events.
     class SmartCollection < Array
+      # Implemented event list.
       EVENTS = [
         :before_defaults,
         :before_match,
@@ -63,16 +66,116 @@ module AeEasy
       #
       # @raise [ArgumentError] When unknown event key.
       #
+      # @example before_defaults
+      #   defaults = {'aaa' => 111}
+      #   collection = SmartCollection.new [],
+      #     defaults: defaults
+      #   collection.bind_event(:before_defaults) do |collection, item|
+      #     puts collection
+      #     # => []
+      #     puts item
+      #     # => {'bbb' => 222}
+      #
+      #     # Sending the item back is required, or a new one
+      #     #   in case you want to replace item to insert.
+      #     item
+      #   end
+      #   data << {'bbb' => 222}
+      #   data
+      #   # => [{'aaa' => 111, 'bbb' => 222}]
+      #
+      # @example before_match
+      #   keys = ['id']
+      #   defaults = {'aaa' => 111}
+      #   values = [
+      #     {'id' => 1, 'ccc' => 333}
+      #   ]
+      #   collection = SmartCollection.new keys,
+      #     defaults: defaults
+      #     values: values
+      #   collection.bind_event(:before_match) do |collection, item|
+      #     puts collection
+      #     # => [{'id' => 1, 'aaa' => 111, 'ccc' => 333}]
+      #     puts item
+      #     # => {'id' => 1, 'aaa' => 111, 'bbb' => 222}
+      #
+      #     # Sending the item back is required, or a new one
+      #     #   in case you want to replace item to insert.
+      #     item
+      #   end
+      #   data << {'id' => 1, 'bbb' => 222}
+      #   data
+      #   # => [{'id' => 1, 'aaa' => 111, 'bbb' => 222}]
+      #
+      # @example before_insert
+      #   keys = ['id']
+      #   defaults = {'aaa' => 111}
+      #   values = [
+      #     {'id' => 1, 'ccc' => 333}
+      #   ]
+      #   collection = SmartCollection.new keys,
+      #     defaults: defaults
+      #     values: values
+      #   collection.bind_event(:before_insert) do |collection, item, match|
+      #     puts collection
+      #     # => [{'id' => 1, 'aaa' => 111, 'ccc' => 333}]
+      #     puts item
+      #     # => {'id' => 1, 'aaa' => 111, 'bbb' => 222}
+      #     puts match
+      #     # => {'id' => 1, 'aaa' => 111, 'ccc' => 333}
+      #
+      #     # Sending the item back is required, or a new one
+      #     #   in case you want to replace item to insert.
+      #     item
+      #   end
+      #   data << {'id' => 1, 'bbb' => 222}
+      #   data
+      #   # => [{'id' => 1, 'aaa' => 111, 'bbb' => 222}]
+      #
+      # @example after_insert
+      #   keys = ['id']
+      #   defaults = {'aaa' => 111}
+      #   values = [
+      #     {'id' => 1, 'ccc' => 333}
+      #   ]
+      #   collection = SmartCollection.new keys,
+      #     defaults: defaults
+      #     values: values
+      #   collection.bind_event(:after_insert) do |collection, item, match|
+      #     puts collection
+      #     # => [{'id' => 1, 'aaa' => 111, 'bbb' => 222}]
+      #     puts item
+      #     # => {'id' => 1, 'aaa' => 111, 'bbb' => 222}
+      #     puts match
+      #     # => {'id' => 1, 'aaa' => 111, 'ccc' => 333}
+      #     # No need to send item back since it is already inserted
+      #   end
+      #   data << {'id' => 1, 'bbb' => 222}
+      #   data
+      #   # => [{'id' => 1, 'aaa' => 111, 'bbb' => 222}]
+      #
       # @note Some events will expect a return value to replace item on insertion:
       #   * `before_match`
       #   * `before_defaults`
       #   * `before_insert`
-      #   * `after_insert`
-      def add_event key, &block
-        unless EVENTS.has_key? key
+      def bind_event key, &block
+        unless EVENTS.include? key
           raise ArgumentError.new("Unknown event '#{key}'")
         end
         (events[key] ||= []) << block
+      end
+
+      # Call an event
+      # @private
+      #
+      # @param [Symbol] key Event name.
+      # @param default Detault return value when event's return nil.
+      # @param args event arguments.
+      def call_event key, default = nil, *args
+        return default if events[key].nil?
+        result = nil
+        events[key].each{|event| result = event.call self, *args}
+        result.nil? ? default : result
       end
 
       # Check whenever two items keys match.
@@ -100,32 +203,33 @@ module AeEasy
       def apply_defaults item
         defaults.each do |key, value|
           next unless item[key].nil?
-          value = value.respond_to?(:call) ? value.call(item) : value
+          item[key] = value.respond_to?(:call) ? value.call(item) : value
         end
       end
 
-      # Call an event
-      # @private
+      # Find an item by matching filter keys
       #
-      # @param [Symbol] key Event name.
-      # @params args event arguments.
-      def call_event key, *args
-        return if events[key].nil?
-        events[key].each{|event| event.call self, *args}
+      # @param [Hash] filter
+      #
+      # @return [Hash|nil] First existing item match or nil when no match.
+      #
+      # @note _Warning:_ It uses table scan to filter and will be slow.
+      def find_match filter
+        self.find do |item|
+          match_keys? item, filter
+        end
       end
 
       # Add/remplace an item avoiding duplicates
       def << item
-        item = call_event(:before_defaults, item) || item
+        item = call_event :before_defaults, item, item
         apply_defaults item
-        item = call_event(:before_match, item) || item
-        match = self.find do |existing_item|
-          match_keys? existing_item, item
-        end
-        call_event :before_insert, item
-        delete match unless match.nil? || !!match
-        super(item)
-        call_event :after_insert, item
+        item = call_event :before_match, item, item
+        match = find_match item
+        item = call_event :before_insert, item, item, match
+        delete match unless match.nil?
+        result = super(item)
+        call_event :after_insert, result, item, match
       end
     end
   end

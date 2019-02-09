@@ -9,7 +9,8 @@ describe 'parser behavior' do
     end
 
     # Parser context
-    @context, @message_queue = AeEasy::Core::Test::Helper.parser_context_vars
+    exposed_methods = AnswersEngine::Scraper::RubyParserExecutor.exposed_methods
+    @context, @message_queue = AeEasy::Core::Mock.context_vars exposed_methods
   end
 
   describe 'integration test' do

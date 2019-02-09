@@ -1,9 +1,12 @@
 module AeEasy
   module Core
+    # Configuration manager tool useful for global configuration data accross
+    #   the scraping process.
     class Config
       include AeEasy::Core::Plugin::InitializeHook
       include AeEasy::Core::Plugin::ConfigBehavior
 
+      alias :collection_key :config_collection_key
       alias :collection :config_collection
 
       # Initialize config object

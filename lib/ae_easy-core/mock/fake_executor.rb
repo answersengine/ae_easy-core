@@ -1,30 +1,70 @@
 module AeEasy
   module Core
     module Mock
-      # Fake exector that emulates `AnswersEngine` executor.
-      class FakeExecutor
-        # Page content as string.
+      # Fake executor that emulates `AnswersEngine` executor.
+      module FakeExecutor
+        # Page content.
+        # @return [String,nil]
         attr_accessor :content
-        # Failed page content as string.
+        # Failed page content.
+        # @return [String,nil]
         attr_accessor :failed_content
-        # Draft pages, usually get saved after execution.
-        attr_reader :pages
-        # Draft outputs, usually get saved after execution.
-        attr_reader:outputs
 
         include AnswersEngine::Plugin::ContextExposer
+
+        # Validate executor methods compatibility.
+        # @private
+        #
+        # @param [Array] source Answersengine executor method collection.
+        # @param [Array] fragment Fake executor method collection.
+        #
+        # @return [Hash]
+        # @raise [AeEasy::Core::Exception::OutdatedError] When missing methods.
+        def self.check_compatibility source, fragment
+          report = AeEasy::Core.analyze_compatibility source, fragment
+
+          unless report[:new].count < 1
+            # Warn when outdated
+            warn <<-LONGDESC.gsub(/^\s+/,'')
+              It seems answersengine has new unmapped methods, try updating
+              ae_easy-core gem or contacting gem maintainer to update it.
+              New methods: #{report[:new].join ', '}
+            LONGDESC
+          end
+
+          # Ensure no missing methods
+          unless report[:is_compatible]
+            message = <<-LONGDESC.gsub(/^\s+/,'')
+              There are missing methods! Check your answersengine gem version.
+              Missing methods: #{report[:missing].join ', '}
+            LONGDESC
+            raise AeEasy::Core::Exception::OutdatedError.new(message)
+          end
+
+          report
+        end
+
+        # Draft pages, usually get saved after execution.
+        # @return [Array]
+        def pages
+          @pages ||= []
+        end
+
+        # Draft outputs, usually get saved after execution.
+        # @return [Array]
+        def outputs
+          @outputs ||= []
+        end
 
         # Remove all elements on pages.
         # @private
         def clear_draft_pages
-          @pages ||= []
           @pages.clear
         end
 
         # Remove all elements on outputs.
         # @private
         def clear_draft_outputs
-          @outputs ||= []
           @outputs.clear
         end
 
@@ -35,14 +75,24 @@ module AeEasy
 
         # Initialize object.
         #
-        # @param [Hash] opts ({}) Options
+        # @param [Hash] opts ({}) Configuration options.
         # @option opts [Array] :pages (nil) Array to initialize pages, can be nil for empty.
         # @option opts [Array] :outputs (nil) Array to initialize outputs, can be nil for empty.
         # @option opts [Integer] :job_id (nil) A number to represent the job_id.
+        # @option opts [Hash] :page (nil) Current page.
+        #
+        # @raise [ArgumentError] When pages or outputs are not Array.
         def initialize opts = {}
-          job_id = opts[:job_id]
-          clear_draft_pages
-          clear_draft_outputs
+          unless opts[:pages].nil? || opts[:pages].is_a?(Array)
+            raise ArgumentError.new "Pages must be an array."
+          end
+          @pages = opts[:pages]
+          unless opts[:outputs].nil? || opts[:outputs].is_a?(Array)
+            raise ArgumentError.new "Outputs must be an array."
+          end
+          @outputs = opts[:outputs]
+          self.job_id = opts[:job_id]
+          self.page = opts[:page]
         end
 
         # Fake job ID used by executor.
@@ -54,6 +104,7 @@ module AeEasy
         # Set fake job id value.
         def job_id= value
           db.job_id = value
+          page['job_id'] = value
         end
 
         # Current page used by executor.
@@ -64,8 +115,12 @@ module AeEasy
 
         # Set current page.
         def page= value
-          job_id = value['job_id']
-          value['job_id'] ||= job_id
+          unless value.nil?
+            value = AeEasy::Core::Mock::FakeDb.build_page value
+            self.job_id = value['job_id'] unless value['job_id'].nil?
+            value['job_id'] ||= job_id
+            db.page_gid = value['gid'] unless value['gid'].nil?
+          end
           @page = value
         end
 
@@ -119,13 +174,13 @@ module AeEasy
         # @param [Integer] per_page (30) Page size.
         #
         # @return [Array]
-        def find_outputs collection = 'default', raw_query = {}, page = 1, per_page = 30
+        def find_outputs collection = 'default', query = {}, page = 1, per_page = 30
           count = 0
           offset = (page - 1) * per_page
-          query = raw_query.merge(
+          fixed_query = query.merge(
             '_collection' => collection
           )
-          db.query :outputs, query, offset, per_page
+          db.query :outputs, fixed_query, offset, per_page
         end
 
         # Find one output by collection and query with pagination.
@@ -135,46 +190,15 @@ module AeEasy
         #
         # @return [Hash, nil]
         def find_output collection = 'default', query = {}
-          fint_outputs collection, query, 1, 1
-        end
-
-        # Validate executor methods compatibility.
-        # @private
-        #
-        # @param [Array] source Answersengine executor method collection.
-        # @param [Array] fragment Fake executor method collection.
-        #
-        # @return [Hash]
-        # @raise [AeEasy::Core::Exception::OutdatedError] When missing methods.
-        def check_compatibility source, fragment
-          report = AeEasy::Core.analyze_compatibility source, fragment
-
-          unless report[:new].count < 1
-            # Warn when outdated
-            warn <<-LONGDESC.gsub(/^\s+/,'')
-              It seems answersengine has new unmapped methods, try updating
-              ae_easy-core gem or contacting gem maintainer to update it.
-              New methods: #{report[:new].join ', '}
-            LONGDESC
-          end
-
-          # Ensure no missing methods
-          unless report[:is_compatible]
-            message = <<-LONGDESC.gsub(/^\s+/,'')
-              There are missing methods! Check your answersengine gem version.
-              Missing methods: #{report[:missing].join ', '}
-            LONGDESC
-            raise AeEasy::Core::Exception::OutdatedError.new(message)
-          end
-
-          report
+          result = find_outputs(collection, query, 1, 1)
+          result.nil? ? nil : result.first
         end
 
         # Execute an script file as an executor.
         #
         # @param [String] file_path Script file path to execute.
-        def execute_script file_path
-          eval(File.read(file_path), isolated_binding, file_path)
+        def execute_script file_path, vars = {}
+          eval(File.read(file_path), isolated_binding(vars), file_path)
           flush
         end
       end

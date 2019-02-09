@@ -7,7 +7,9 @@ describe 'parser' do
       include AeEasy::Core::Plugin::Parser
     end
 
-    @context, @message_queue = AeEasy::Core::Test::Helper.parser_context_vars
+    # Parser context
+    exposed_methods = AnswersEngine::Scraper::RubyParserExecutor.exposed_methods
+    @context, @message_queue = AeEasy::Core::Mock.context_vars exposed_methods
   end
 
   describe 'integration test' do

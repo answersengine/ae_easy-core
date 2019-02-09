@@ -45,21 +45,33 @@ describe 'config behavior' do
       end
     end
 
-    it 'should find a config value' do
-      # context = AeEasy::Core::Test::Helper.parser_context_vars
-      # outputs = []
-      # find_ouput = lambda do |collection, filter|
-      #   outputs.each do |output|
-      #     match = true
-      #     filter.each{|k,v| match = false if output[k] != v}
-      #     return output if match
-      #   end
-      #   nil
-      # end
-      # class << context
-      #   define_method :find_output, lambda do|collection, |outputs.find{||}}
-      # end
-      # @object.mock
+    it 'should generate an initial config value when not exists' do
+      class << @object
+        define_method(:find_output){|collection, filter|nil}
+      end
+      @object.initialize_hook_core_config_behavior
+      data = @object.find_config 'aaa'
+      expected = {'_collection' => 'config', '_id' => 'aaa'}
+      assert_equal expected, data
+    end
+
+    it 'should generate an initial config value when not exists' do
+      class << @object
+        define_method(:find_output) do |collection, filter|
+          filter.merge(
+            '_collection' => collection,
+            'bbb' => '222'
+          )
+        end
+      end
+      @object.initialize_hook_core_config_behavior
+      data = @object.find_config 'aaa'
+      expected = {
+        '_collection' => 'config',
+        '_id' => 'aaa',
+        'bbb' => '222'
+      }
+      assert_equal expected, data
     end
   end
 end

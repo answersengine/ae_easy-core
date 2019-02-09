@@ -7,7 +7,7 @@ PATH
 PATH
   remote: /var/www/html/app/core/answersengine
   specs:
-    answersengine (0.2.29)
+    answersengine (0.2.31)
       httparty (~> 0.16.2)
       nokogiri (~> 1.6, < 1.10)
       thor (~> 0.20.3)
@@ -42,6 +42,7 @@ GEM
       simplecov
     simplecov-html (0.10.2)
     thor (0.20.3)
+    timecop (0.9.1)
 
 PLATFORMS
   ruby
@@ -54,6 +55,7 @@ DEPENDENCIES
   rake (~> 10.0)
   simplecov (~> 0.16.1)
   simplecov-console (~> 0.4.2)
+  timecop (~> 0.9.1)
 
 BUNDLED WITH
    1.17.3

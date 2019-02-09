@@ -9,7 +9,8 @@ describe 'seeder behavior' do
     end
 
     # Seeder context
-    @context, @message_queue = AeEasy::Core::Test::Helper.parser_context_vars
+    exposed_methods = AnswersEngine::Scraper::RubySeederExecutor.exposed_methods
+    @context, @message_queue = AeEasy::Core::Mock.context_vars exposed_methods
   end
 
   describe 'integration test' do
@@ -89,6 +90,64 @@ describe 'seeder behavior' do
               'ccc' => '333',
               'ddd' => 'DEF'
             }
+          }
+        ]]]
+      ]
+      assert_equal @message_queue, expected
+    end
+
+    it 'should save a single output' do
+      output = {
+        '_id' => 'abc123',
+        'value_a' => 'hello world',
+        'value_b' => 123,
+        'value_c' => true
+      }
+      @object.mock_context @context
+      @object.save output
+
+      expected = [
+        [:save_outputs, [[{
+          '_id' => 'abc123',
+          'value_a' => 'hello world',
+          'value_b' => 123,
+          'value_c' => true
+        }]]]
+      ]
+      assert_equal @message_queue, expected
+    end
+
+    it 'should save a collection of outputs' do
+      outputs = [
+        {
+          '_id' => 'abc123',
+          'value_a' => 'hello world',
+          'value_b' => 123,
+          'value_c' => true
+        },
+        {
+          '_id' => 'def456',
+          'value_a' => 'my message',
+          'value_d' => ['AAA', 'BBB'],
+          'value_e' => 456
+        }
+      ]
+      @object.mock_context @context
+      @object.save outputs
+
+      expected = [
+        [:save_outputs, [[
+          {
+            '_id' => 'abc123',
+            'value_a' => 'hello world',
+            'value_b' => 123,
+            'value_c' => true
+          },
+          {
+            '_id' => 'def456',
+            'value_a' => 'my message',
+            'value_d' => ['AAA', 'BBB'],
+            'value_e' => 456
           }
         ]]]
       ]

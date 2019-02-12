@@ -1,3 +1,7 @@
+[![Documentation](http://img.shields.io/badge/docs-rdoc.info-blue.svg)](http://rubydoc.org/gems/ae_easy-core/frames)
+[![Gem Version](https://badge.fury.io/rb/ae_easy-core.svg)](http://github.com/answersengine/ae_easy-core/releases)
+[![License](http://img.shields.io/badge/license-MIT-yellowgreen.svg)](#license)
+
 # AeEasy core module
 ## Description
 
@@ -9,4 +13,4 @@ Install gem:
 Require gem
 ```require 'ae_easy-core'```
 
-Detail class/module documentation can be found [here](doc/index.html).
+Documentation can be found [here](http://rubydoc.org/gems/ae_easy-core/frames).

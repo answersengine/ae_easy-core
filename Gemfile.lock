@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ae_easy-core (0.0.3)
+    ae_easy-core (0.0.4)
       answersengine (>= 0.2.25)
 
 GEM

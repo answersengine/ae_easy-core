@@ -1,3 +1,5 @@
+$LOAD_PATH.unshift File.expand_path("../../lib", __FILE__)
+
 require 'simplecov'
 require 'simplecov-console'
 SimpleCov.formatter = SimpleCov::Formatter::Console
@@ -8,4 +10,4 @@ require 'minitest/spec'
 require 'minitest/autorun'
 require 'timecop'
 require 'byebug'
-require 'ae_easy-core'
+require 'ae_easy/core'

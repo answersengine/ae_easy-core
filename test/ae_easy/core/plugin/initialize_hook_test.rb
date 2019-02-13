@@ -26,7 +26,7 @@ describe 'initialize hook' do
         'Hello letter B',
         'Hello letter C'
       ]
-      assert_equal message_queue, expected
+      assert_equal message_queue.sort, expected.sort
     end
   end
 end

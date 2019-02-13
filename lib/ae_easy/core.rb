@@ -1,12 +1,12 @@
 require 'time'
 require 'answersengine'
-require 'ae_easy-core/smart_collection'
-require 'ae_easy-core/exception'
-require 'ae_easy-core/plugin'
-require 'ae_easy-core/helper'
-require 'ae_easy-core/config'
-require 'ae_easy-core/mock'
-require 'ae_easy-core/version'
+require 'ae_easy/core/smart_collection'
+require 'ae_easy/core/exception'
+require 'ae_easy/core/plugin'
+require 'ae_easy/core/helper'
+require 'ae_easy/core/config'
+require 'ae_easy/core/mock'
+require 'ae_easy/core/version'
 
 module AeEasy
   module Core
@@ -16,7 +16,7 @@ module AeEasy
       #
       # @return [String]
       def gem_root
-        File.expand_path File.join(File.dirname(__FILE__), '..')
+        File.expand_path File.join(File.dirname(__FILE__), '../..')
       end
 
       # Execute an action for all scripts within a directory.

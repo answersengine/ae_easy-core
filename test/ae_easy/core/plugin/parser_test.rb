@@ -1,15 +1,14 @@
-require 'test_helper'
 
-describe 'seeder' do
+describe 'parser' do
   before do
     # Parser object
     @object = Object.new
     class << @object
-      include AeEasy::Core::Plugin::Seeder
+      include AeEasy::Core::Plugin::Parser
     end
 
-    # Seeder context
-    exposed_methods = AnswersEngine::Scraper::RubySeederExecutor.exposed_methods
+    # Parser context
+    exposed_methods = AnswersEngine::Scraper::RubyParserExecutor.exposed_methods
     @context, @message_queue = AeEasy::Core::Mock.context_vars exposed_methods
   end
 
@@ -25,7 +24,7 @@ describe 'seeder' do
 
       mock_methods = mixed_methods - default_methods - [:mock_initialize]
       expected_methods = AeEasy::Core.instance_methods_from @context
-      assert_equal mock_methods, expected_methods
+      assert_equal mock_methods.sort, expected_methods.sort
     end
   end
 end

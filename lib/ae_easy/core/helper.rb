@@ -1,4 +1,4 @@
-require 'ae_easy-core/helper/cookie'
+require 'ae_easy/core/helper/cookie'
 
 module AeEasy
   module Core

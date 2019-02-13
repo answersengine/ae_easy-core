@@ -2,23 +2,30 @@ require 'test_helper'
 
 describe 'ae_easy-core' do
   it 'should get gem root correctly' do
-    root = File.expand_path(File.join(File.dirname(__FILE__), '..'))
+    root = File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
     assert_equal AeEasy::Core.gem_root, root
   end
 
   it 'should list all scripts from directory' do
-    directory = File.expand_path(File.dirname(__FILE__))
+    directory = File.expand_path('./test/fake_scripts/group_a')
     file_list = AeEasy::Core.all_scripts(directory)
-    expected = Dir[File.join(directory, '*.rb')]
+    expected = [
+      File.expand_path('./test/fake_scripts/group_a/script_a.rb'),
+      File.expand_path('./test/fake_scripts/group_a/script_b.rb'),
+      File.expand_path('./test/fake_scripts/group_a/script_c.rb')
+    ]
     assert_equal expected, file_list
   end
 
-  it 'should list all scripts from directory except self' do
-    directory = File.expand_path(File.dirname(__FILE__))
-    self_script = 'gem_test.rb'
+  it 'should list all scripts from directory except script_a' do
+    directory = File.expand_path('./test/fake_scripts/group_a')
+    self_script = 'script_a.rb'
     file_list = AeEasy::Core.all_scripts directory, except: [self_script]
-    expected = Dir[File.join(directory, '*.rb')] - [__FILE__]
-    assert_equal expected, file_list
+    expected = [
+      File.expand_path('./test/fake_scripts/group_a/script_b.rb'),
+      File.expand_path('./test/fake_scripts/group_a/script_c.rb')
+    ]
+    assert_equal expected.sort, file_list.sort
   end
 
   it 'should require all scripts with except' do

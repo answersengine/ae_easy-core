@@ -88,7 +88,7 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/ae_easy-core/plugin/config_behavior.rb</dd>
+    <dd>lib/ae_easy/core/plugin/config_behavior.rb</dd>
   </dl>
   
 </div>
@@ -281,7 +281,7 @@
 7</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy-core/plugin/config_behavior.rb', line 5</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/plugin/config_behavior.rb', line 5</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_config_collection_key'>config_collection_key</span>
   <span class='ivar'>@config_collection_key</span>
@@ -342,7 +342,7 @@
 28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy-core/plugin/config_behavior.rb', line 26</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/plugin/config_behavior.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_config_collection'>config_collection</span>
   <span class='id identifier rubyid_collections'>collections</span><span class='lbracket'>[</span><span class='id identifier rubyid_config_collection_key'>config_collection_key</span><span class='rbracket'>]</span>
@@ -415,7 +415,7 @@
 39</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy-core/plugin/config_behavior.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/plugin/config_behavior.rb', line 36</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_find_config'>find_config</span> <span class='id identifier rubyid_key'>key</span>
   <span class='id identifier rubyid_value'>value</span> <span class='op'>=</span> <span class='id identifier rubyid_find_output'>find_output</span> <span class='id identifier rubyid_config_collection'>config_collection</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>_id</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_key'>key</span>
@@ -515,7 +515,7 @@
 22</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy-core/plugin/config_behavior.rb', line 19</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/plugin/config_behavior.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize_hook_core_config_behavior'>initialize_hook_core_config_behavior</span> <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='ivar'>@config_collection_key</span><span class='comma'>,</span> <span class='id identifier rubyid_collection'>collection</span> <span class='op'>=</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:config_collection</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbracket'>[</span><span class='symbol'>:config</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>config</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span>
@@ -531,9 +531,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Feb  9 06:02:26 2019 by
+  Generated on Wed Feb 13 20:37:50 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.18 (ruby-2.4.4).
+  0.9.18 (ruby-2.5.3).
 </div>
 
     </div>

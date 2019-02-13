@@ -83,7 +83,7 @@
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/ae_easy-core/plugin/initialize_hook.rb</dd>
+    <dd>lib/ae_easy/core/plugin/initialize_hook.rb</dd>
   </dl>
   
 </div>
@@ -192,7 +192,7 @@
 13</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy-core/plugin/initialize_hook.rb', line 8</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/plugin/initialize_hook.rb', line 8</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize_hooks'>initialize_hooks</span> <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='id identifier rubyid_initializers'>initializers</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_methods'>methods</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='op'>|</span><span class='id identifier rubyid_i'>i</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span> <span class='op'>=~</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^initialize_hook_</span><span class='regexp_end'>/</span></span><span class='rbrace'>}</span>
@@ -210,9 +210,9 @@
 </div>
 
       <div id="footer">
-  Generated on Sat Feb  9 06:02:26 2019 by
+  Generated on Wed Feb 13 20:37:50 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.18 (ruby-2.4.4).
+  0.9.18 (ruby-2.5.3).
 </div>
 
     </div>

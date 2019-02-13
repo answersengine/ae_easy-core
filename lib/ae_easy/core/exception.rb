@@ -1,4 +1,4 @@
-require 'ae_easy-core/exception/outdated_error'
+require 'ae_easy/core/exception/outdated_error'
 
 module AeEasy
   module Core

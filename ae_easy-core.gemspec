@@ -1,7 +1,7 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "ae_easy-core/version"
+require "ae_easy/core/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "ae_easy-core"
@@ -9,22 +9,26 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Eduardo Rosales"]
   spec.email         = ["eduardo@datahen.com"]
 
-  spec.summary       = %q{AnswersEngine toolkit core module}
-  spec.description   = %q{AnswersEngine toolkit core module to support other complex modules.}
+  spec.summary       = %q{AnswersEngine Easy toolkit core module}
+  spec.description   = %q{AnswersEngine Easy toolkit core module to support other complex modules.}
   spec.homepage      = "https://answersengine.com"
   spec.license       = "MIT"
 
-  spec.cert_chain  = ['certs/ae_easy.pem']
-  spec.signing_key = File.expand_path("~/.ssh/gems/gem-private_ae_easy.pem") if $0 =~ /gem\z/
+  # spec.cert_chain  = ['certs/ae_easy.pem']
+  # spec.signing_key = File.expand_path("~/.ssh/gems/gem-private_ae_easy.pem") if $0 =~ /gem\z/
 
-  # # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
-  # # to allow pushing to a single host or delete this section to allow pushing to any host.
-  # if spec.respond_to?(:metadata)
-  #   spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
-  # else
-  #   raise "RubyGems 2.2.2 or newer is required to protect against " \
-  #     "public gem pushes."
-  # end
+  # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
+  # to allow pushing to a single host or delete this section to allow pushing to any host.
+  if spec.respond_to?(:metadata)
+    # spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
+
+    spec.metadata["homepage_uri"] = spec.homepage
+    spec.metadata["source_code_uri"] = "https://github.com/answersengine/ae_easy-core"
+    # spec.metadata["changelog_uri"] = "TODO: Put your gem's CHANGELOG.md URL here."
+  else
+    raise "RubyGems 2.0 or newer is required to protect against " \
+      "public gem pushes."
+  end
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
@@ -33,11 +37,13 @@ Gem::Specification.new do |spec|
   end
   spec.require_paths = ["lib"]
   spec.required_ruby_version = '>= 2.2.2'
-  spec.add_dependency "answersengine", "~> 0.2.25"
-  spec.add_development_dependency "rake", "~> 10.0"
-  spec.add_development_dependency "minitest", "~> 5.11"
-  spec.add_development_dependency 'simplecov', '~> 0.16.1'
-  spec.add_development_dependency 'simplecov-console', '~> 0.4.2'
-  spec.add_development_dependency 'timecop', '~> 0.9.1'
-  spec.add_development_dependency "byebug", '~> 0'
+
+  spec.add_dependency 'answersengine', '>= 0.2.25'
+  spec.add_development_dependency 'bundler', '>= 1.16.3'
+  spec.add_development_dependency 'rake', '>= 10.0'
+  spec.add_development_dependency 'minitest', '>= 5.11'
+  spec.add_development_dependency 'simplecov', '>= 0.16.1'
+  spec.add_development_dependency 'simplecov-console', '>= 0.4.2'
+  spec.add_development_dependency 'timecop', '>= 0.9.1'
+  spec.add_development_dependency 'byebug', '>= 0'
 end

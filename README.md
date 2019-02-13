@@ -10,7 +10,7 @@ AeEasy core is part of AeEasy gem collection and allow advance AnswersEngine fea
 Install gem:
 ```gem install 'ae_easy-core'```
 
-Require gem
+Require gem:
 ```require 'ae_easy-core'```
 
 Documentation can be found [here](http://rubydoc.org/gems/ae_easy-core/frames).

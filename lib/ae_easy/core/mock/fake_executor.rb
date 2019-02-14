@@ -134,18 +134,21 @@ module AeEasy
           db.outputs
         end
 
-        # Save a page collection on db.
+        # Save a page collection on db and remove all the element from +list+.
         #
         # @param [Array] list Collection of pages to save.
         def save_pages list
           list.each{|page| db.pages << page}
+          list.clear
         end
 
-        # Save an output collection on db.
+        # Save an output collection on db and remove all the element from
+        #   +list+.
         #
         # @param [Array] list Collection of outputs to save.
         def save_outputs list
           list.each{|output| db.outputs << output}
+          list.clear
         end
 
         # Save draft pages into db and clear draft queue.

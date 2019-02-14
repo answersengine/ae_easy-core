@@ -74,7 +74,7 @@ describe 'ae_easy-core' do
       :my_test_b
     ]
     data = AeEasy::Core.instance_methods_from object
-    assert_equal expected, data
+    assert_equal expected.sort, data.sort
   end
 
   it 'should analyze compatibility when uncompatible fragment' do

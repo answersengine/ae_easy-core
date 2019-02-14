@@ -42,6 +42,32 @@ describe 'fake executor' do
       assert_empty @executor.saved_outputs
     end
 
+    it 'should clean array on save_pages' do
+      list = [
+        {'url' => 'https://aaa.com'},
+        {'url' => 'https://bbb.com'},
+        {'url' => 'https://ccc.com'}
+      ]
+      @executor.save_pages list
+      assert_empty list
+      assert_equal 'https://aaa.com', @executor.saved_pages[0]['url']
+      assert_equal 'https://bbb.com', @executor.saved_pages[1]['url']
+      assert_equal 'https://ccc.com', @executor.saved_pages[2]['url']
+    end
+
+    it 'should clean array on save_outputs' do
+      list = [
+        {'aaa' => 111},
+        {'bbb' => '222'},
+        {'ccc' => 'CCC'}
+      ]
+      @executor.save_outputs list
+      assert_empty list
+      assert_equal 111, @executor.saved_outputs[0]['aaa']
+      assert_equal '222', @executor.saved_outputs[1]['bbb']
+      assert_equal 'CCC', @executor.saved_outputs[2]['ccc']
+    end
+
     it 'should clean only outputs drafts and keep saved outputs intact' do
       @executor.outputs << {'aaa' => 'AAA'}
       assert_operator @executor.outputs.count, :==, 1

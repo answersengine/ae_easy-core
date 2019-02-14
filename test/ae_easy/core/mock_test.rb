@@ -14,7 +14,7 @@ describe 'mock' do
         [:bar, ['A', 'B']],
         [:bar, ['111', '222']]
       ]
-      assert_equal [:boo, :bar], context_methods
+      assert_equal [:bar, :boo], context_methods.sort
       assert_equal expected, message_queue
     end
   end

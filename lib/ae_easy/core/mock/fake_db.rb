@@ -71,7 +71,7 @@ module AeEasy
         # Clean an URL to remove fragment, lowercase schema and host, and sort
         #   query string.
         #
-        # @param [String] url URL to clean.
+        # @param [String] raw_url URL to clean.
         #
         # @return [String]
         def self.clean_uri raw_url

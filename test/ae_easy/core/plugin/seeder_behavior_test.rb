@@ -22,7 +22,7 @@ describe 'seeder behavior' do
 
       mock_methods = mixed_methods - default_methods
       expected_methods = AeEasy::Core.instance_methods_from @context
-      assert_equal mock_methods, expected_methods
+      assert_equal mock_methods.sort, expected_methods.sort
     end
   end
 

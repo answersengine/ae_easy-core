@@ -140,12 +140,18 @@ describe 'fake executor' do
       assert_equal 123, @executor.job_id
     end
 
+    it 'should initialize with scraper_name' do
+      @executor.mock_initialize scraper_name: 'AAA'
+      assert_equal 'AAA', @executor.scraper_name
+    end
+
     it 'should initialize with page' do
       page = {
         'gid' => 'CCC',
         'url' => 'https://ccc.com',
         'job_id' => 888
       }
+      @executor.db.enable_job_id_override
       @executor.mock_initialize page: page
       assert_equal 'CCC', @executor.page['gid']
       assert_equal 'https://ccc.com', @executor.page['url']
@@ -164,12 +170,18 @@ describe 'fake executor' do
       end
     end
 
+    it 'should set scraper name' do
+      @executor.scraper_name = 'BBB'
+      assert_equal 'BBB', @executor.scraper_name
+    end
+
     it 'should set job id' do
       @executor.job_id = 444
       assert_equal 444, @executor.job_id
     end
 
     it 'should set page' do
+      @executor.db.enable_job_id_override
       @executor.page = {
         'gid' => '111',
         'url' => 'https://aaa.com',
@@ -178,6 +190,23 @@ describe 'fake executor' do
       assert_equal '111', @executor.page['gid']
       assert_equal 'https://aaa.com', @executor.page['url']
       assert_equal 222, @executor.page['job_id']
+    end
+
+    it 'should save jobs to fake db correctly' do
+      assert_operator @executor.saved_jobs.count, :==, 1
+      assert_operator @executor.db.jobs.count, :==, 1
+      @executor.save_jobs [
+        {'job_id' => 111},
+        {'job_id' => 222}
+      ]
+      assert_operator @executor.saved_jobs.count, :==, 3
+      assert_operator @executor.db.jobs.count, :==, 3
+      assert_equal @executor.db.jobs[1], @executor.saved_jobs[1]
+      job_a = @executor.db.jobs[1]
+      assert_equal 111, job_a['job_id']
+      assert_equal @executor.db.jobs[2], @executor.saved_jobs[2]
+      job_b = @executor.db.jobs[2]
+      assert_equal 222, job_b['job_id']
     end
 
     it 'should save pages to fake db correctly' do
@@ -300,10 +329,48 @@ describe 'fake executor' do
       end
       assert_match /Hello World! AAA BBB/, out
     end
+
+    describe 'get latest job' do
+      it 'by scraper name get null when scraper name is null' do
+        @executor.save_jobs [
+          {'job_id' => 111, 'scraper_name' => 'AAA'},
+          {'job_id' => 222, 'scraper_name' => 'BBB'},
+          {'job_id' => 333, 'scraper_name' => 'AAA'},
+          {'job_id' => 444, 'scraper_name' => 'CCC'}
+        ]
+        data = @executor.latest_job_by nil
+        assert_nil data
+      end
+
+      it 'by scraper name without filters' do
+        @executor.save_jobs [
+          {'job_id' => 111, 'scraper_name' => 'AAA'},
+          {'job_id' => 222, 'scraper_name' => 'BBB'},
+          {'job_id' => 333, 'scraper_name' => 'AAA'},
+          {'job_id' => 444, 'scraper_name' => 'CCC'}
+        ]
+        data = @executor.latest_job_by 'AAA'
+        assert_equal 333, data['job_id']
+      end
+
+      it 'by scraper name and status' do
+        @executor.save_jobs [
+          {'job_id' => 111, 'scraper_name' => 'AAA', 'status' => 'done'},
+          {'job_id' => 222, 'scraper_name' => 'AAA', 'status' => 'done'},
+          {'job_id' => 333, 'scraper_name' => 'BBB', 'status' => 'done'},
+          {'job_id' => 444, 'scraper_name' => 'AAA', 'status' => 'active'}
+        ]
+        data = @executor.latest_job_by 'AAA', {
+          'status' => 'done'
+        }
+        assert_equal 222, data['job_id']
+      end
+    end
   end
 
   describe 'integration test' do
     it 'should keep page in sync with db' do
+      @executor.db.enable_job_id_override
       @executor.page = {
         'gid' => 'AAA',
         'job_id' => 111,
@@ -331,6 +398,18 @@ describe 'fake executor' do
       assert_equal 'https://bbb.com', @executor.page['url']
       assert_equal 222, @executor.job_id
       assert_equal 'BBB', @executor.db.page_gid
+    end
+
+    it 'should keep scraper name in sync with db' do
+      @executor.scraper_name = 'AAA'
+      assert_operator @executor.saved_jobs.count, :==, 1
+      assert_equal 'AAA', @executor.scraper_name
+      assert_equal 'AAA', @executor.db.scraper_name
+      assert_equal 'AAA', @executor.saved_jobs.first['scraper_name']
+      @executor.scraper_name = 'BBB'
+      assert_equal 'BBB', @executor.scraper_name
+      assert_equal 'BBB', @executor.db.scraper_name
+      assert_equal 'BBB', @executor.saved_jobs.first['scraper_name']
     end
 
     it 'should keep job id in sync with db' do
@@ -450,6 +529,112 @@ describe 'fake executor' do
       assert_equal '888', output_b['hhh']
     end
 
+    it 'should validate collection to be String when find outputs' do
+      @executor.save_outputs [{'aaa' => '1'}]
+      assert_raises(ArgumentError, /collection.+?String/) do
+        data = @executor.find_outputs 123
+      end
+      data = @executor.find_outputs 'default'
+      assert_operator data.count, :==, 1
+      assert_equal '1', data[0]['aaa']
+    end
+
+    it 'should validate query to be Hash when find outputs' do
+      @executor.save_outputs [{'aaa' => '1'}]
+      assert_raises(ArgumentError, /query.+?Hash/) do
+        data = @executor.find_outputs 'default', []
+      end
+      data = @executor.find_outputs 'default', {}
+      assert_operator data.count, :==, 1
+      assert_equal '1', data[0]['aaa']
+    end
+
+    it 'should validate page to be Integer when find outputs' do
+      @executor.save_outputs [{'aaa' => '1'}]
+      assert_raises(ArgumentError, /page.+?Integer/) do
+        data = @executor.find_outputs 'default', {}, 'A'
+      end
+      data = @executor.find_outputs 'default', {}, 1
+      assert_operator data.count, :==, 1
+      assert_equal '1', data[0]['aaa']
+    end
+
+    it 'should validate page to be greater than 0 when find outputs' do
+      @executor.save_outputs [{'aaa' => '1'}]
+      assert_raises(ArgumentError, /page.+?greater\s+than\s+0/) do
+        data = @executor.find_outputs 'default', {}, 0
+      end
+      data = @executor.find_outputs 'default', {}, 1
+      assert_operator data.count, :==, 1
+      assert_equal '1', data[0]['aaa']
+    end
+
+    it 'should validate per_page to be Integer when find outputs' do
+      @executor.save_outputs [{'aaa' => '1'}]
+      assert_raises(ArgumentError, /per_page.+?Integer/) do
+        data = @executor.find_outputs 'default', {}, 1, 'A'
+      end
+      data = @executor.find_outputs 'default', {}, 1, 1
+      assert_operator data.count, :==, 1
+      assert_equal '1', data[0]['aaa']
+    end
+
+    it 'should validate page to be between 1 and 500 when find outputs' do
+      @executor.save_outputs [{'aaa' => '1'}]
+      assert_raises(ArgumentError, /per_page.+?between\s+1\s+and\s+500/) do
+        data_a = @executor.find_outputs 'default', {}, 1, 0
+      end
+      data_a = @executor.find_outputs 'default', {}, 1, 1
+      assert_operator data_a.count, :==, 1
+      assert_equal '1', data_a[0]['aaa']
+      assert_raises(ArgumentError, /per_page.+?between\s+1\s+and\s+500/) do
+        data_b = @executor.find_outputs 'default', {}, 1, 501
+      end
+      data_b = @executor.find_outputs 'default', {}, 1, 500
+      assert_operator data_b.count, :==, 1
+      assert_equal '1', data_b[0]['aaa']
+    end
+
+    it 'should find outputs by scraper_name' do
+      @executor.db.enable_job_id_override
+      @executor.save_jobs [
+        {'job_id' => 111, 'scraper_name' => 'AAA'},
+        {'job_id' => 222, 'scraper_name' => 'BBB'}
+      ]
+      assert_operator @executor.saved_jobs.count, :==, 3
+      @executor.save_outputs [
+        {'_job_id' => 111, 'aaa' => '1'},
+        {'_job_id' => 222, 'aaa' => '2'},
+        {'_job_id' => 111, 'aaa' => '3'},
+        {'_job_id' => 222, 'aaa' => '4'}
+      ]
+      assert_operator @executor.saved_outputs.count, :==, 4
+      data = @executor.find_outputs 'default', {}, 1, 4, scraper_name: 'BBB'
+      assert_operator data.count, :==, 2
+      assert_equal '2', data[0]['aaa']
+      assert_equal '4', data[1]['aaa']
+    end
+
+    it 'should find outputs by job_id' do
+      @executor.db.enable_job_id_override
+      @executor.save_jobs [
+        {'job_id' => 111, 'scraper_name' => 'AAA'},
+        {'job_id' => 222, 'scraper_name' => 'BBB'}
+      ]
+      assert_operator @executor.saved_jobs.count, :==, 3
+      @executor.save_outputs [
+        {'_job_id' => 111, 'aaa' => '1'},
+        {'_job_id' => 222, 'aaa' => '2'},
+        {'_job_id' => 111, 'aaa' => '3'},
+        {'_job_id' => 222, 'aaa' => '4'}
+      ]
+      assert_operator @executor.saved_outputs.count, :==, 4
+      data = @executor.find_outputs 'default', {}, 1, 4, job_id: 111
+      assert_operator data.count, :==, 2
+      assert_equal '1', data[0]['aaa']
+      assert_equal '3', data[1]['aaa']
+    end
+
     it 'should execute script with context and flush correctly' do
       class << @executor
         define_method(:exposed_methods) do
@@ -481,6 +666,7 @@ describe 'fake executor' do
         define_method :mock_find_outputs, lambda{@mock_find_outputs}
         define_method :mock_set_find_outputs, lambda{|v|@mock_find_outputs = v}
       end
+      @executor.db.enable_job_id_override
       @executor.page = {
         'gid' => '123',
         'job_id' => 555,

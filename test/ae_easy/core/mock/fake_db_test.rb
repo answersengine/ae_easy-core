@@ -4,12 +4,27 @@ describe 'fake db' do
   describe 'unit test' do
     it 'should have page keys' do
       expected = ['gid']
-      assert_equal expected, AeEasy::Core::Mock::FakeDb::PAGE_KEYS
+      assert_equal expected.sort, AeEasy::Core::Mock::FakeDb::PAGE_KEYS.sort
     end
 
     it 'should have output keys' do
       expected = ['_id', '_collection']
-      assert_equal expected, AeEasy::Core::Mock::FakeDb::OUTPUT_KEYS
+      assert_equal expected.sort, AeEasy::Core::Mock::FakeDb::OUTPUT_KEYS.sort
+    end
+
+    it 'should have job keys' do
+      expected = ['job_id']
+      assert_equal expected.sort, AeEasy::Core::Mock::FakeDb::JOB_KEYS.sort
+    end
+
+    it 'should have job statuses' do
+      expected = {
+        active: 'active',
+        done: 'done',
+        cancelled: 'cancelled',
+        paused: 'paused'
+      }
+      assert_equal expected, AeEasy::Core::Mock::FakeDb::JOB_STATUSES
     end
 
     it 'should have default collection' do
@@ -60,6 +75,36 @@ describe 'fake db' do
       assert_equal second_uuid_b, uuid_b
     end
 
+    describe 'clean_uri' do
+      it 'should clean fragment from url' do
+        url = 'https://abc.com/aaa/bbb?ccc=333#I-am-a-fragment'
+        data = AeEasy::Core::Mock::FakeDb.clean_uri url
+        expected = 'https://abc.com/aaa/bbb?ccc=333'
+        assert_equal expected, data
+      end
+
+      it 'should lowercase schema and hostname' do
+        url = 'htTps://wwW.aBc.com/aAa/bbB?cCc=333'
+        data = AeEasy::Core::Mock::FakeDb.clean_uri url
+        expected = 'https://www.abc.com/aAa/bbB?cCc=333'
+        assert_equal expected, data
+      end
+
+      it 'should sort query string' do
+        url = 'https://www.abc.com/aaa/bbb?ddd=ddd&eee=eee&ccc=333&ddd=444&eee=555'
+        data = AeEasy::Core::Mock::FakeDb.clean_uri url
+        expected = 'https://www.abc.com/aaa/bbb?ccc=333&ddd=ddd&ddd=444&eee=eee&eee=555'
+        assert_equal expected, data
+      end
+
+      it 'should clean without query string' do
+        url = 'https://abc.com/aaa/bbb'
+        data = AeEasy::Core::Mock::FakeDb.clean_uri url
+        expected = 'https://abc.com/aaa/bbb'
+        assert_equal expected, data
+      end
+    end
+
     it 'should initialize without options' do
       db = AeEasy::Core::Mock::FakeDb.new
       assert_kind_of AeEasy::Core::Mock::FakeDb, db
@@ -91,6 +136,18 @@ describe 'fake db' do
       refute db.allow_page_gid_override?
     end
 
+    it 'should initialize with enabled allow_job_id_override' do
+      db = AeEasy::Core::Mock::FakeDb.new allow_job_id_override: true
+      assert_kind_of AeEasy::Core::Mock::FakeDb, db
+      assert db.allow_job_id_override?
+    end
+
+    it 'should initialize with disabled allow_job_id_override' do
+      db = AeEasy::Core::Mock::FakeDb.new allow_job_id_override: false
+      assert_kind_of AeEasy::Core::Mock::FakeDb, db
+      refute db.allow_job_id_override?
+    end
+
     describe 'instance' do
       before do
         @db = AeEasy::Core::Mock::FakeDb.new
@@ -116,16 +173,58 @@ describe 'fake db' do
         refute @db.allow_page_gid_override?
       end
 
+      it 'should generate same page gid when fragment' do
+        gid_a = @db.generate_page_gid('url' => 'https://abc.com/aaa#fragment')
+        gid_b = @db.generate_page_gid('url' => 'https://abc.com/aaa')
+        assert_equal gid_a, gid_b
+      end
+
+      it 'should generate same page gid when unsorted query string' do
+        gid_a = @db.generate_page_gid('url' => 'https://abc.com/aaa/?aaa=111&bbb=222')
+        gid_b = @db.generate_page_gid('url' => 'https://abc.com/aaa/?bbb=222&aaa=111')
+        assert_equal gid_a, gid_b
+      end
+
+      it 'should generate same page gid when schema and hostname differ on case' do
+        gid_a = @db.generate_page_gid('url' => 'htTps://aBc.com/aaa')
+        gid_b = @db.generate_page_gid('url' => 'HttPs://abC.cOm/aaa')
+        assert_equal gid_a, gid_b
+      end
+
+      it 'should generate same page gid when headers contains an unsorted array' do
+        headers_a = {
+          'aaa' => ['bbb', 'ccc', 'ddd'],
+          'bbb' => 222,
+          'ccc' => 'ccc'
+        }
+        gid_a = @db.generate_page_gid('url' => 'https://abc.com', 'headers' => headers_a)
+        headers_b = {
+          'aaa' => ['ccc', 'bbb', 'ddd'],
+          'bbb' => 222,
+          'ccc' => 'ccc'
+        }
+        gid_b = @db.generate_page_gid('url' => 'https://abc.com', 'headers' => headers_b)
+        assert_equal gid_a, gid_b
+      end
+
+      it 'should generate same page gid when headers contains an unsorted array' do
+        cookie_a = 'aaa=111; bbb=222; ccc=ccc'
+        gid_a = @db.generate_page_gid('url' => 'https://www.abc.com', 'cookie' => cookie_a)
+        cookie_b = 'ccc=ccc; aaa=111; bbb=222'
+        gid_b = @db.generate_page_gid('url' => 'https://www.abc.com', 'cookie' => cookie_b)
+        assert_equal gid_a, gid_b
+      end
+
       it 'should generate page gids consistently' do
         base_hash = {
-          'url' => 0,
-          'method' => 0,
+          'url' => 'https://aaa.com',
+          'method' => 'GET',
           'headers' => {
             'Cookies' => 0,
             'Referer' => 0
           },
           'fetch_type' => 0,
-          'cookie' => 0,
+          'cookie' => 'aaa=111',
           'no_redirect' => [],
           'body' => 0,
           'ua_type' => 0
@@ -141,8 +240,14 @@ describe 'fake db' do
           elsif hash[key].is_a? Array
             hash[key] = base_hash[key].clone
             hash[key].pop
-          else
+          elsif hash[key].is_a? Integer
             hash[key] = 111
+          elsif key == 'url'
+            hash[key] = 'https://bbb.com'
+          elsif key == 'cookie'
+            hash[key] = 'bbb=222'
+          else
+            hash[key] = '222'
           end
           gid_a = @db.generate_page_gid hash
           gid_b = @db.generate_page_gid hash
@@ -155,18 +260,30 @@ describe 'fake db' do
       end
 
       it 'should generate page defaults' do
-        expected = {
-          'url' => nil,
-          'method' => 'GET',
-          'headers' => {},
-          'fetch_type' => 'standard',
-          'cookie' => nil,
-          'no_redirect' => false,
-          'body' => nil,
-          'ua_type' => 'desktop',
-          'vars' => {}
-        }
-        assert_equal expected, @db.page_defaults
+        expected_keys = [
+          'url',
+          'job_id',
+          'method',
+          'headers',
+          'fetch_type',
+          'cookie',
+          'no_redirect',
+          'body',
+          'ua_type',
+          'vars'
+        ]
+        data = @db.page_defaults
+        assert_equal expected_keys.sort, data.keys.sort
+        assert_equal nil, data['url']
+        assert_equal @db.job_id, data['job_id'].call({})
+        assert_equal 'GET', data['method']
+        assert_equal({}, data['headers'])
+        assert_equal 'standard', data['fetch_type']
+        assert_equal nil, data['cookie']
+        assert_equal false, data['no_redirect']
+        assert_equal nil, data['body']
+        assert_equal 'desktop', data['ua_type']
+        assert_equal({}, data['vars'])
       end
 
       it 'should generate output ids consistently' do
@@ -278,6 +395,7 @@ describe 'fake db' do
         @db.pages << input_page
         expected = [{
           'gid' => @db.pages.first['gid'],
+          'job_id' => @db.job_id,
           'url' => 'https://www.example.com/abc',
           'method' => 'POST',
           'headers' => {
@@ -323,6 +441,7 @@ describe 'fake db' do
         }
         expected = [{
           'gid' => @db.pages.first['gid'],
+          'job_id' => @db.job_id,
           'url' => 'https://www.example.com/abc',
           'method' => 'GET',
           'headers' => {
@@ -379,6 +498,7 @@ describe 'fake db' do
         }
         expected = [{
           'gid' => '555',
+          'job_id' => @db.job_id,
           'url' => 'https://www.example.com/bbb',
           'method' => 'GET',
           'headers' => {},
@@ -408,6 +528,54 @@ describe 'fake db' do
         refute_equal @db.pages[0]['gid'], @db.pages[1]['gid']
       end
 
+      it 'should keep job_id on page insert when job id override is enabled' do
+        @db.enable_job_id_override
+        assert_empty @db.pages
+        @db.job_id = 222
+        @db.pages << {
+          'job_id' => 111,
+          'url' => 'https://www.example.com/abc'
+        }
+        assert_operator @db.pages.count, :==, 1
+        assert_equal 111, @db.pages.first['job_id']
+      end
+
+      it 'should replace job id on page insert when job id override is disabled' do
+        @db.disable_job_id_override
+        assert_empty @db.pages
+        @db.job_id = 222
+        @db.pages << {
+          'job_id' => 111,
+          'url' => 'https://www.example.com/aaa'
+        }
+        assert_operator @db.pages.count, :==, 1
+        assert_equal 222, @db.pages[0]['job_id']
+      end
+
+      it 'should keep job_id on output insert when job id override is enabled' do
+        @db.enable_job_id_override
+        assert_empty @db.outputs
+        @db.job_id = 222
+        @db.outputs << {
+          '_job_id' => 111,
+          'aaa' => 'AAA'
+        }
+        assert_operator @db.outputs.count, :==, 1
+        assert_equal 111, @db.outputs.first['_job_id']
+      end
+
+      it 'should replace job id on output insert when job id override is disabled' do
+        @db.disable_job_id_override
+        assert_empty @db.outputs
+        @db.job_id = 222
+        @db.outputs << {
+          '_job_id' => 111,
+          'aaa' => 'AAA'
+        }
+        assert_operator @db.outputs.count, :==, 1
+        assert_equal 222, @db.outputs[0]['_job_id']
+      end
+
       it 'should generate id on output insert' do
         assert_empty @db.outputs
         @db.outputs << {
@@ -417,6 +585,28 @@ describe 'fake db' do
         output = @db.outputs.first
         assert_kind_of String, output['_id']
         assert_operator output['_id'].length, :>, 0
+      end
+
+      it 'should generate scraper_name on job insert' do
+        assert_operator @db.jobs.count, :==, 1
+        @db.jobs << {
+          'job_id' => 123
+        }
+        assert_operator @db.jobs.count, :==, 2
+        job = @db.jobs.last
+        assert_kind_of String, job['scraper_name']
+        assert_operator job['scraper_name'].strip.length, :>, 0
+      end
+
+      it 'should generate job_id on job insert' do
+        assert_operator @db.jobs.count, :==, 1
+        @db.jobs << {
+          'scraper_name' => 'AAA'
+        }
+        assert_operator @db.jobs.count, :==, 2
+        job = @db.jobs.last
+        assert_kind_of Integer, job['job_id']
+        assert_equal 2, job['job_id']
       end
 
       it 'should raise error on query when unknown collection' do
@@ -429,7 +619,7 @@ describe 'fake db' do
         before do
           @time = Time.now
           @formatted_time = @time.strftime('%Y-%m-%dT%H:%M:%SZ')
-          Timecop.travel @time
+          Timecop.freeze @time
           @output_base = {
             '_collection' => 'default',
             '_job_id' => @db.job_id,
@@ -442,18 +632,183 @@ describe 'fake db' do
           Timecop.return
         end
 
+
+        it 'should build page without options' do
+          page = {
+            'gid' => 'abc',
+            'url' => 'https://vvv.com',
+            'method' => 'POST',
+            'vars' => {
+              'aaa' => 'AAA'
+            }
+          }
+          data = AeEasy::Core::Mock::FakeDb.build_page page
+          expected = {
+            'gid' => 'abc',
+            'job_id' => @db.job_id,
+            'url' => 'https://vvv.com',
+            'method' => 'POST',
+            'headers' => {},
+            'fetch_type' => 'standard',
+            'cookie' => nil,
+            'no_redirect' => false,
+            'body' => nil,
+            'ua_type' => 'desktop',
+            'vars' => {
+              'aaa' => 'AAA'
+            }
+          }
+          assert_equal expected, data
+        end
+
+        it 'should build fake page without options' do
+          data = AeEasy::Core::Mock::FakeDb.build_fake_page
+          expected = {
+            'gid' => data['gid'],
+            'job_id' => @db.job_id,
+            'url' => 'https://example.com',
+            'method' => 'GET',
+            'headers' => {},
+            'fetch_type' => 'standard',
+            'cookie' => nil,
+            'no_redirect' => false,
+            'body' => nil,
+            'ua_type' => 'desktop',
+            'vars' => {}
+          }
+          assert_equal expected, data
+        end
+
+        it 'should build job without options' do
+          job = {
+            'job_id' => 123,
+            'scraper_name' => 'abc'
+          }
+          data = AeEasy::Core::Mock::FakeDb.build_job job
+          expected = {
+            'job_id' => 123,
+            'scraper_name' => 'abc',
+            'status' => 'done',
+            'created_at' => @time
+          }
+          assert_operator data, :==, expected
+        end
+
+        it 'should build fake job without options' do
+          data = AeEasy::Core::Mock::FakeDb.build_fake_job
+          expected_keys = [
+            'job_id',
+            'scraper_name',
+            'status',
+            'created_at'
+          ]
+          assert_equal expected_keys.sort, data.keys.sort
+          assert_kind_of Integer, data['job_id']
+          assert_operator data['job_id'], :>, 0
+          assert_kind_of String, data['scraper_name']
+          refute_equal '', data['scraper_name'].strip
+          assert_equal 'done', data['status']
+        end
+
+        it 'should generate job defaults' do
+          class << @db
+            define_method(:generate_job_id){123}
+            define_method(:generate_scraper_name){'abc'}
+          end
+          data = @db.job_defaults
+          keys = data.keys
+          expected_keys = [
+            'job_id',
+            'scraper_name',
+            'status',
+            'created_at'
+          ]
+          assert_equal expected_keys.sort, keys.sort
+          assert_equal 123, data['job_id'].call({})
+          assert_equal 'abc', data['scraper_name'].call({})
+          assert_equal 'done', data['status']
+          assert_equal @time, data['created_at'].call({})
+        end
+
+        it 'should stringify job data on job insert' do
+          assert_operator @db.jobs.count, :==, 1
+          input_job = {
+            job_id: 111,
+            scraper_name: 'BBB',
+            status: 'cancelled'
+          }
+          @db.jobs << input_job
+          assert_operator @db.jobs.count, :==, 2
+          expected = {
+            'job_id' => 111,
+            'scraper_name' => 'BBB',
+            'status' => 'cancelled',
+            'created_at' => @time
+          }
+          assert_equal expected, @db.jobs.last
+        end
+
+        it 'should not modify original job data on job insert' do
+          assert_operator @db.jobs.count, :==, 1
+          input_job = {
+            job_id: 222,
+            'scraper_name': 'CCC',
+            'status' => 'done'
+          }
+          @db.jobs << input_job
+          assert_operator @db.jobs.count, :==, 2
+          expected = {
+            job_id: 222,
+            'scraper_name': 'CCC',
+            'status' => 'done'
+          }
+          assert_equal expected, input_job
+        end
+
+        it 'should add missing values on job insert' do
+          assert_operator @db.jobs.count, :==, 1
+          @db.job_id = 123
+          @db.jobs << {
+            'scraper_name' => 'CCC'
+          }
+          expected = {
+            'job_id' => 124,
+            'scraper_name' => 'CCC',
+            'status' => 'done',
+            'created_at' => @time
+          }
+          assert_equal expected, @db.jobs.last
+        end
+
+        it 'should replace job with same id on job insert' do
+          assert_operator @db.jobs.count, :==, 1
+          @db.jobs << {
+            'job_id' => 444,
+            'scraper_name' => 'AAA'
+          }
+          assert_operator @db.jobs.count, :==, 2
+          @db.jobs << {
+            'job_id' => 444,
+            'scraper_name' => 'BBB'
+          }
+          assert_operator @db.jobs.count, :==, 2
+          job = @db.jobs.last
+          assert_equal 444, job['job_id']
+          assert_equal 'BBB', job['scraper_name']
+        end
+
         it 'should generate output defaults' do
           @db.job_id = 444
           @db.page_gid = '555'
           data = @db.output_defaults
-          keys = data.keys.sort!
+          keys = data.keys
           expected_keys = [
             '_collection',
             '_created_at',
             '_gid',
             '_job_id'
           ]
-          assert_equal expected_keys, keys
+          assert_equal expected_keys.sort, keys.sort
           assert_equal 'default', data['_collection']
           assert_equal 444, data['_job_id'].call({})
           assert_equal '555', data['_gid'].call({})
@@ -550,48 +905,134 @@ describe 'fake db' do
   end
 
   describe 'integration test' do
-    it 'should build fake page without options' do
-      page = {
-        'gid' => 'abc',
-        'url' => 'https://vvv.com',
-        'method' => 'POST',
-        'vars' => {
-          'aaa' => 'AAA'
-        }
-      }
-      data = AeEasy::Core::Mock::FakeDb.build_page page
-      expected = {
-        'gid' => 'abc',
-        'url' => 'https://vvv.com',
-        'method' => 'POST',
-        'headers' => {},
-        'fetch_type' => 'standard',
-        'cookie' => nil,
-        'no_redirect' => false,
-        'body' => nil,
-        'ua_type' => 'desktop',
-        'vars' => {
-          'aaa' => 'AAA'
-        }
-      }
-      assert_equal expected, data
+    describe 'ensure job' do
+      before do
+        @db = AeEasy::Core::Mock::FakeDb.new
+      end
+
+      it 'should create job when set to null' do
+        assert_equal 1, @db.jobs.count
+        assert_equal 1, @db.job_id
+        scraper_name = @db.scraper_name
+        @db.job_id = nil
+        assert_equal 2, @db.job_id
+        assert_equal 2, @db.jobs.count
+        data = @db.jobs[1]
+        assert_equal 2, data['job_id']
+        assert_kind_of String, data['scraper_name']
+        refute_equal '', data['scraper_name'].strip
+        assert_equal scraper_name, data['scraper_name']
+        assert_equal 'active', data['status']
+      end
+
+      it 'should create job when new job_id is set' do
+        assert_equal 1, @db.jobs.count
+        assert_equal 1, @db.job_id
+        scraper_name = @db.scraper_name
+        @db.job_id = 123
+        assert_equal 123, @db.job_id
+        assert_equal 2, @db.jobs.count
+        data = @db.jobs[1]
+        assert_equal 123, data['job_id']
+        assert_kind_of String, data['scraper_name']
+        refute_equal '', data['scraper_name'].strip
+        assert_equal scraper_name, data['scraper_name']
+        assert_equal 'active', data['status']
+      end
     end
 
-    it 'should build fake page without options' do
-      data = AeEasy::Core::Mock::FakeDb.build_fake_page
-      expected = {
-        'gid' => data['gid'],
-        'url' => 'https://example.com',
-        'method' => 'GET',
-        'headers' => {},
-        'fetch_type' => 'standard',
-        'cookie' => nil,
-        'no_redirect' => false,
-        'body' => nil,
-        'ua_type' => 'desktop',
-        'vars' => {}
-      }
-      assert_equal expected, data
+    describe 'query jobs' do
+      before do
+        @db = AeEasy::Core::Mock::FakeDb.new
+        @db.jobs.clear
+        @db.job_id = 111
+        @db.scraper_name = 'AAA'
+        @db.jobs << {
+          'job_id' => 111,
+          'scraper_name' => 'AAA',
+          'status' => 'done'
+        }
+        @db.jobs << {
+          'job_id' => 222,
+          'scraper_name' => 'AAA',
+          'status' => 'done'
+        }
+        @db.jobs << {
+          'job_id' => 333,
+          'scraper_name' => 'BBB',
+          'status' => 'done'
+        }
+        @db.jobs << {
+          'job_id' => 444,
+          'scraper_name' => 'BBB',
+          'status' => 'cancelled'
+        }
+        @db.jobs << {
+          'job_id' => 555,
+          'scraper_name' => 'BBB',
+          'status' => 'cancelled'
+        }
+      end
+
+      it 'should return empty when no jobs' do
+        @db.jobs.clear
+        assert_empty @db.jobs
+        data = @db.query :jobs, {'scraper_name' => 'BBB'}
+        assert_equal [], data
+      end
+
+      it 'should filter jobs' do
+        data = @db.query :jobs, {'status' => 'cancelled'}
+        assert_operator data.count, :==, 2
+        data.sort{|a,b|a['job_id'] <=> b['job_id']}
+        assert_equal 444, data[0]['job_id']
+        assert_equal 555, data[1]['job_id']
+      end
+
+      it 'should query all jobs when no filters' do
+        data = @db.query :jobs, {}
+        assert_operator data.count, :==, 5
+        data.sort{|a,b|a['job_id'] <=> b['job_id']}
+        assert_equal 111, data[0]['job_id']
+        assert_equal 222, data[1]['job_id']
+        assert_equal 333, data[2]['job_id']
+        assert_equal 444, data[3]['job_id']
+        assert_equal 555, data[4]['job_id']
+      end
+
+      it 'should limit without offset' do
+        data = @db.query :jobs, {}, 0, 2
+        assert_operator data.count, :==, 2
+        data.sort{|a,b|a['job_id'] <=> b['job_id']}
+        assert_equal 111, data[0]['job_id']
+        assert_equal 222, data[1]['job_id']
+      end
+
+      it 'should limit with offset' do
+        data = @db.query :jobs, {}, 2, 2
+        assert_operator data.count, :==, 2
+        data.sort{|a,b|a['job_id'] <=> b['job_id']}
+        assert_equal 333, data[0]['job_id']
+        assert_equal 444, data[1]['job_id']
+      end
+
+      it 'should offset without limit' do
+        data = @db.query :jobs, {}, 1
+        assert_operator data.count, :==, 4
+        data.sort{|a,b|a['job_id'] <=> b['job_id']}
+        assert_equal 222, data[0]['job_id']
+        assert_equal 333, data[1]['job_id']
+        assert_equal 444, data[2]['job_id']
+        assert_equal 555, data[3]['job_id']
+      end
+
+      it 'should limit with offset and filters' do
+        data = @db.query :jobs, {'status' => 'done'}, 1, 2
+        assert_operator data.count, :==, 2
+        data.sort{|a,b|a['job_id'] <=> b['job_id']}
+        assert_equal 222, data[0]['job_id']
+        assert_equal 333, data[1]['job_id']
+      end
     end
 
     describe 'query pages' do

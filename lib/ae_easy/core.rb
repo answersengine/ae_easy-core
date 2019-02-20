@@ -1,4 +1,5 @@
 require 'time'
+require 'faker'
 require 'answersengine'
 require 'ae_easy/core/smart_collection'
 require 'ae_easy/core/exception'

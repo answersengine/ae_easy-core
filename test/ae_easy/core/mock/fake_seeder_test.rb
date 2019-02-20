@@ -27,7 +27,7 @@ describe 'fake seeder' do
         :find_outputs
       ]
       assert_empty err
-      assert_equal expected, data
+      assert_equal expected.sort, data.sort
     end
   end
 

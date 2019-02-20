@@ -1,6 +1,10 @@
 require 'test_helper'
 
 describe 'ae_easy-core' do
+  it "has a version number" do
+    refute_nil AeEasy::Core::VERSION
+  end
+
   it 'should get gem root correctly' do
     root = File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
     assert_equal AeEasy::Core.gem_root, root
@@ -14,7 +18,7 @@ describe 'ae_easy-core' do
       File.expand_path('./test/fake_scripts/group_a/script_b.rb'),
       File.expand_path('./test/fake_scripts/group_a/script_c.rb')
     ]
-    assert_equal expected, file_list
+    assert_equal expected.sort, file_list.sort
   end
 
   it 'should list all scripts from directory except script_a' do

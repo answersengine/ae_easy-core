@@ -60,7 +60,7 @@ describe 'smart collection' do
         '_id',
         '_collection'
       ]
-      assert_equal keys, data.key_fields
+      assert_equal expected.sort, data.key_fields.sort
       assert_equal Hash.new, data.defaults
       assert_equal [], data
     end

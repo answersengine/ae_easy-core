@@ -40,14 +40,15 @@ module AeEasy
       # @param [Hash] opts ({}) Configuration options.
       # @option opts [Array] :except (nil) Literal file collection excluded from process.
       def require_all dir, opts = {}
-        real_dir = options = nil
-        real_except = []
+        dir_list = real_dir_list = options = nil
+        real_except = (opts[:except] || []).map{|f| "#{f}.rb"}
+        options = opts.merge except: real_except
         $LOAD_PATH.each do |load_path|
-          real_dir = File.join load_path, dir
-          next unless File.directory? real_dir
-          real_except = (opts[:except] || []).map{|f| "#{f}.rb"}
-          options = opts.merge except: real_except
-          all_scripts(real_dir, options) {|file| require file}
+          dir_list = Dir.glob File.join(load_path, dir)
+          dir_list.each do |real_dir|
+            next unless File.directory? real_dir
+            all_scripts(real_dir, options) {|file| require file}
+          end
         end
       end
 
@@ -59,7 +60,11 @@ module AeEasy
       def require_relative_all dir, opts = {}
         real_except = (opts[:except] || []).map{|f| "#{f}.rb"}
         options = opts.merge except: real_except
-        all_scripts(dir, options) {|file| require file}
+        dir_list = Dir.glob dir
+        dir_list.each do |relative_dir|
+          real_dir = File.expand_path relative_dir
+          all_scripts(real_dir, options) {|file| require file}
+        end
       end
 
       # Expose an environment into an object instance as methods.

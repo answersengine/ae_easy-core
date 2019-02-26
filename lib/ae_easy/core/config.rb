@@ -6,7 +6,9 @@ module AeEasy
       include AeEasy::Core::Plugin::InitializeHook
       include AeEasy::Core::Plugin::ConfigBehavior
 
+      # {AeEasy::Core::Plugin::ConfigBehavior#config_collection_key}
       alias :collection_key :config_collection_key
+      # {AeEasy::Core::Plugin::ConfigBehavior#config_collection}
       alias :collection :config_collection
 
       # Initialize config object

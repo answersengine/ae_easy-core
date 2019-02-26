@@ -97,7 +97,7 @@ module AeEasy
         # Format headers for gid generation.
         # @private
         #
-        # @param [Hash|nil] headers Headers hash.
+        # @param [Hash,nil] headers Headers hash.
         #
         # @return [Hash]
         def self.format_headers headers
@@ -441,7 +441,7 @@ module AeEasy
         # @param [Symbol] collection Allowed values: `:outputs`, `:pages`.
         # @param [Hash] filter Filters to query.
         # @param [Integer] offset (0) Search results offset.
-        # @param [Integer|nil] limit (nil) Limit search results count. Set to `nil` for unlimited.
+        # @param [Integer,nil] limit (nil) Limit search results count. Set to `nil` for unlimited.
         #
         # @raise ArgumentError On unknown collection.
         #

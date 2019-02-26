@@ -202,7 +202,7 @@ module AeEasy
         # @param [String] scraper_name Scraper name.
         # @param [Hash] filter ({}) Additional_filters.
         #
-        # @return [Hash|nil] Return nil if no scraper_name or scraper_name is
+        # @return [Hash,nil] Return nil if no scraper_name or scraper_name is
         #   nil.
         def latest_job_by scraper_name, filter = {}
           return nil if scraper_name.nil?
@@ -217,9 +217,9 @@ module AeEasy
         # @param [Integer] page (1) Page number.
         # @param [Integer] per_page (30) Page size.
         # @param [Hash] opts ({}) Configuration options.
-        # @option opts [String|nil] :scraper_name (nil) Scraper name to query
+        # @option opts [String,nil] :scraper_name (nil) Scraper name to query
         #   from.
-        # @option opts [Integer|nil] :job_id (nil) Job's id to query from.
+        # @option opts [Integer,nil] :job_id (nil) Job's id to query from.
         #
         # @raise [ArgumentError] +collection+ is not String.
         # @raise [ArgumentError] +query+ is not a Hash.
@@ -271,9 +271,9 @@ module AeEasy
         # @param [String] collection ('default') Collection name.
         # @param [Hash] query ({}) Filters to query.
         # @param [Hash] opts ({}) Configuration options.
-        # @option opts [String|nil] :scraper_name (nil) Scraper name to query
+        # @option opts [String,nil] :scraper_name (nil) Scraper name to query
         #   from.
-        # @option opts [Integer|nil] :job_id (nil) Job's id to query from.
+        # @option opts [Integer,nil] :job_id (nil) Job's id to query from.
         #
         # @raise [ArgumentError] +collection+ is not String.
         # @raise [ArgumentError] +query+ is not a Hash.

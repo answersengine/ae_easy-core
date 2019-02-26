@@ -1,15 +1,15 @@
 require 'test_helper'
 
-describe 'seeder' do
+describe 'executor' do
   before do
-    # Seeder object
+    # Executor object
     @object = Object.new
     class << @object
-      include AeEasy::Core::Plugin::Seeder
+      include AeEasy::Core::Plugin::Executor
     end
 
-    # Seeder context
-    exposed_methods = AnswersEngine::Scraper::RubySeederExecutor.exposed_methods
+    # Context
+    exposed_methods = [:save_pages, :save_outputs]
     @context, @message_queue = AeEasy::Core::Mock.context_vars exposed_methods
   end
 

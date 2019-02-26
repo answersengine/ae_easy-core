@@ -211,7 +211,7 @@ module AeEasy
       #
       # @param [Hash] filter
       #
-      # @return [Hash|nil] First existing item match or nil when no match.
+      # @return [Hash,nil] First existing item match or nil when no match.
       #
       # @note _Warning:_ It uses table scan to filter and will be slow.
       def find_match filter

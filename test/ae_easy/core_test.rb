@@ -1,10 +1,6 @@
 require 'test_helper'
 
 describe 'ae_easy-core' do
-  it "has a version number" do
-    refute_nil AeEasy::Core::VERSION
-  end
-
   it 'should get gem root correctly' do
     root = File.expand_path(File.join(File.dirname(__FILE__), '..', '..'))
     assert_equal AeEasy::Core.gem_root, root
@@ -39,6 +35,26 @@ describe 'ae_easy-core' do
     assert_match /Hello group A script A!/i, out
     assert_match /Hello group A script B!/i, out
     refute_match /Hello group A script C!/i, out
+  end
+
+  it 'should require relative all scripts from subdirectories with except' do
+    out, err = capture_io do
+      AeEasy::Core.require_relative_all './test/fake_scripts/group_d/**/', except: ['script_b']
+    end
+    assert_match /Hello group D sub sub_a script A!/i, out
+    refute_match /Hello group D sub_b script B!/i, out
+    assert_match /Hello group D sub script C!/i, out
+    assert_match /Hello group D script D!/i, out
+  end
+
+  it 'should require all scripts from subdirectories with except' do
+    out, err = capture_io do
+      AeEasy::Core.require_all 'fake_scripts/group_c/**/', except: ['script_b']
+    end
+    assert_match /Hello group C sub sub_a script A!/i, out
+    refute_match /Hello group C sub_b script B!/i, out
+    assert_match /Hello group C sub script C!/i, out
+    assert_match /Hello group C script D!/i, out
   end
 
   it 'should require relative all scripts with except' do

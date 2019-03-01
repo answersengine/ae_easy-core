@@ -286,6 +286,16 @@ describe 'fake db' do
         assert_equal({}, data['vars'])
       end
 
+      it 'should generate output ids unique and random' do
+        id_a = @db.generate_output_id('aaa' => 'AAA')
+        id_b = @db.generate_output_id('aaa' => 'AAA')
+        refute_equal id_a, id_b
+        refute_empty id_a
+        assert_kind_of String, id_a
+        refute_empty id_b
+        assert_kind_of String, id_b
+      end
+
       it 'should generate output ids consistently' do
         base_hash = {
           'aaa' => 0,
@@ -313,8 +323,8 @@ describe 'fake db' do
           else
             hash[key] = 111
           end
-          id_a = @db.generate_output_id hash
-          id_b = @db.generate_output_id hash
+          id_a = AeEasy::Core::Mock::FakeDb.output_uuid hash
+          id_b = AeEasy::Core::Mock::FakeDb.output_uuid hash
 
           # Make sure id is consistent
           assert_equal id_a, id_b

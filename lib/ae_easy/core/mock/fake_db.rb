@@ -39,6 +39,16 @@ module AeEasy
           Digest::SHA1.hexdigest seed.to_s
         end
 
+        # Generate a fake UUID based on output fields without `_` prefix.
+        #
+        # @param [Hash] data Output data.
+        #
+        # @return [String]
+        def self.output_uuid data
+          seed = data.select{|k,v|k.to_s =~ /^[^_]/}.hash
+          fake_uuid seed
+        end
+
         # Build a page with defaults by using FakeDb engine.
         #
         # @param [Hash] page Page initial values.
@@ -373,14 +383,14 @@ module AeEasy
           @pages ||= collection
         end
 
-        # Generate a fake UUID based on output fields without `_` prefix.
+        # Generate a fake UUID for outputs.
         #
         # @param [Hash] data Output data.
         #
         # @return [String]
         def generate_output_id data
-          seed = data.select{|k,v|k.to_s =~ /^[^_]/}.hash
-          self.class.fake_uuid seed
+          # Generate random UUID to match AnswersEngine behavior
+          self.class.fake_uuid
         end
 
         # Get output keys with key generators to emulate saving on db.

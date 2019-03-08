@@ -2,10 +2,20 @@ module AeEasy
   module Core
     module Plugin
       module Seeder
-        attr_reader :root_input_dir, :referer, :cookie
-
         include AeEasy::Core::Plugin::InitializeHook
         include AeEasy::Core::Plugin::SeederBehavior
+
+        # Root input directory path.
+        # @return [String]
+        attr_accessor :root_input_dir
+
+        # Referer to use on page seeding.
+        # @return [String]
+        attr_accessor :referer
+
+        # Cookie to use on page seeing.
+        # @return [String]
+        attr_accessor :cookie
 
         # Hook to initialize seeder object.
         #

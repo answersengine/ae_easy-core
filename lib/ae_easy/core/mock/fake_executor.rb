@@ -3,6 +3,8 @@ module AeEasy
     module Mock
       # Fake executor that emulates `AnswersEngine` executor.
       module FakeExecutor
+        include AnswersEngine::Plugin::ContextExposer
+
         # Max allowed page size when query outputs (see #find_outputs).
         MAX_FIND_OUTPUTS_PER_PAGE = 500
 
@@ -12,8 +14,6 @@ module AeEasy
         # Failed page content.
         # @return [String,nil]
         attr_accessor :failed_content
-
-        include AnswersEngine::Plugin::ContextExposer
 
         # Validate executor methods compatibility.
         # @private

@@ -2,10 +2,10 @@ module AeEasy
   module Core
     module Plugin
       module ConfigBehavior
-        attr_reader :config_collection_key
-
         include AeEasy::Core::Plugin::ContextIntegrator
         include AeEasy::Core::Plugin::CollectionVault
+
+        attr_reader :config_collection_key
 
         # Hook to map config behavior on self
         #

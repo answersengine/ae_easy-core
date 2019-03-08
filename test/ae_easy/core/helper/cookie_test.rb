@@ -217,7 +217,7 @@ describe 'cookie helper' do
 
     describe 'should validate if cookie hash is included within other cookie hash' do
       it 'when success full filter' do
-        source = {
+        origin = {
           'aaa' => '111',
           'bbb' => '222',
           'ccc' => '333'
@@ -228,11 +228,11 @@ describe 'cookie helper' do
           'ccc' => '333'
         }
 
-        assert AeEasy::Core::Helper::Cookie.include?(source, filter)
+        assert AeEasy::Core::Helper::Cookie.include?(origin, filter)
       end
 
       it 'when success fragment' do
-        source = {
+        origin = {
           'aaa' => '111',
           'bbb' => '222',
           'ccc' => '333'
@@ -242,11 +242,11 @@ describe 'cookie helper' do
           'ccc' => '333'
         }
 
-        assert AeEasy::Core::Helper::Cookie.include?(source, filter)
+        assert AeEasy::Core::Helper::Cookie.include?(origin, filter)
       end
 
       it 'when partial match fragment' do
-        source = {
+        origin = {
           'aaa' => '111',
           'bbb' => '222',
           'ccc' => '333'
@@ -256,11 +256,11 @@ describe 'cookie helper' do
           'ccc' => '333'
         }
 
-        refute AeEasy::Core::Helper::Cookie.include?(source, filter)
+        refute AeEasy::Core::Helper::Cookie.include?(origin, filter)
       end
 
       it 'when different value fragment' do
-        source = {
+        origin = {
           'aaa' => '111',
           'bbb' => '222',
           'ccc' => '333'
@@ -270,7 +270,7 @@ describe 'cookie helper' do
           'ccc' => '333'
         }
 
-        refute AeEasy::Core::Helper::Cookie.include?(source, filter)
+        refute AeEasy::Core::Helper::Cookie.include?(origin, filter)
       end
     end
   end

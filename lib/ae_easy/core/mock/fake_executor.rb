@@ -18,13 +18,13 @@ module AeEasy
         # Validate executor methods compatibility.
         # @private
         #
-        # @param [Array] source Answersengine executor method collection.
+        # @param [Array] origin Answersengine executor method collection.
         # @param [Array] fragment Fake executor method collection.
         #
         # @return [Hash]
         # @raise [AeEasy::Core::Exception::OutdatedError] When missing methods.
-        def self.check_compatibility source, fragment
-          report = AeEasy::Core.analyze_compatibility source, fragment
+        def self.check_compatibility origin, fragment
+          report = AeEasy::Core.analyze_compatibility origin, fragment
 
           unless report[:new].count < 1
             # Warn when outdated

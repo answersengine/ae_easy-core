@@ -240,14 +240,14 @@ describe 'fake executor' do
 
     it 'should raise error on check compatibility when uncompatible fragment' do
       assert_raises(AeEasy::Core::Exception::OutdatedError) do
-        source = [:pages, :outputs]
+        origin = [:pages, :outputs]
         fragment = [:pages, :outputs, :save_pages]
-        AeEasy::Core::Mock::FakeExecutor.check_compatibility source, fragment
+        AeEasy::Core::Mock::FakeExecutor.check_compatibility origin, fragment
       end
     end
 
     it 'should warn on check compatibility when non exact compatible fragment' do
-      source = [:pages, :outputs, :save_outputs]
+      origin = [:pages, :outputs, :save_outputs]
       fragment = [:pages, :outputs]
       data = nil
       verbose = nil
@@ -255,7 +255,7 @@ describe 'fake executor' do
         verbose = $VERBOSE
         $VERBOSE = true
         out, err = capture_io do
-          data = AeEasy::Core::Mock::FakeExecutor.check_compatibility source, fragment
+          data = AeEasy::Core::Mock::FakeExecutor.check_compatibility origin, fragment
         end
         $VERBOSE = verbose
       ensure
@@ -272,7 +272,7 @@ describe 'fake executor' do
     end
 
     it 'should check compatibility when equal' do
-      source = [:pages, :outputs]
+      origin = [:pages, :outputs]
       fragment = [:pages, :outputs]
       data = nil
       verbose = nil
@@ -280,7 +280,7 @@ describe 'fake executor' do
         verbose = $VERBOSE
         $VERBOSE = true
         out, err = capture_io do
-          data = AeEasy::Core::Mock::FakeExecutor.check_compatibility source, fragment
+          data = AeEasy::Core::Mock::FakeExecutor.check_compatibility origin, fragment
         end
         $VERBOSE = verbose
       ensure

@@ -7,7 +7,7 @@ module AeEasy
 
         # Mock a context methods into self.
         #
-        # @param source Object that represents the context to mock.
+        # @param origin Object that represents the context to mock.
         #
         # @example
         #   class MyContext
@@ -41,8 +41,8 @@ module AeEasy
         #   context.message = 'Hello world again!'
         #   puts my_object.hello_world
         #   # => 'Hello world again!
-        def mock_context source
-          @context = source
+        def mock_context origin
+          @context = origin
           AeEasy::Core.mock_instance_methods context, self
         end
 

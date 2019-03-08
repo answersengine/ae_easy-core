@@ -74,12 +74,12 @@ describe 'ae_easy-core' do
   end
 
   it 'should mock an instance methods into an object' do
-    source = Object.new
-    class << source
+    origin = Object.new
+    class << origin
       define_method :my_test, lambda{|text|"hello world #{text}"}
     end
     target = Object.new
-    AeEasy::Core.mock_instance_methods source, target
+    AeEasy::Core.mock_instance_methods origin, target
     assert_equal target.my_test('test'), 'hello world test'
   end
 

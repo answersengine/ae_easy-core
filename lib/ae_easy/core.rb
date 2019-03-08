@@ -105,6 +105,7 @@ module AeEasy
       # Retrieve instance methods from an object.
       #
       # @param object Object with instance methods.
+      # @param class_only (false) Will get class only methods when `true`.
       #
       # @return [Array]
       #
@@ -122,13 +123,13 @@ module AeEasy
       #   my_object = Foo.new
       #   AeEasy::Core.instance_methods_from my_object
       #   # => [:hello_world, :hello_person]
-      def instance_methods_from object
-        object.methods(false) - Object.new.methods(false)
+      def instance_methods_from object, class_only = false
+        object.methods(!class_only) - Object.new.methods(!class_only)
       end
 
-      # Mock instances methods from the source into target object.
+      # Mock instances methods from the origin into target object.
       #
-      # @param source Object with instance methods to mock.
+      # @param origin Object with instance methods to mock.
       # @param target Object instance to mock methods into.
       #
       # @example
@@ -149,55 +150,55 @@ module AeEasy
       #     end
       #   end
       #
-      #   source = Boo.new
+      #   origin = Boo.new
       #   target = Foo.new
-      #   AeEasy::Core.mock_instance_methods source target
+      #   AeEasy::Core.mock_instance_methods origin target
       #
       #   puts target.hello_world
       #   # => 'Hello world!'
       #   puts target.hello_person
       #   # => 'Hello person!'
       #
-      #   source.message = 'Hello world again!'
+      #   origin.message = 'Hello world again!'
       #   puts target.hello_world
       #   # => 'Hello world again!'
-      def mock_instance_methods source, target
+      def mock_instance_methods origin, target
         # Get instance unique methods
-        method_list = instance_methods_from source
+        method_list = instance_methods_from origin
         method_list.delete :context_binding if method_list.include? :context_binding
 
-        # Build env reflecting source unique methods
+        # Build env reflecting origin unique methods
         env = {}
         method_list.each do |method|
-          env[method] = lambda{|*args|source.send(method, *args)}
+          env[method] = lambda{|*args|origin.send(method, *args)}
         end
 
-        # Mock source unique methods into target
+        # Mock origin unique methods into target
         expose_to target, env
       end
 
-      # Generate a compatibility report from a source and a fragment as a hash.
+      # Generate a compatibility report from a origin and a fragment as a hash.
       #
-      # @param [Array] source Item collection to represent the universe.
-      # @param [Array] fragment Item collection to compare againt +source+.
+      # @param [Array] origin Item collection to represent the universe.
+      # @param [Array] fragment Item collection to compare againt +origin+.
       #
       # @return [Hash]
       #   * `:missing [Array]` (`[]`) Methods on `fragment` only.
-      #   * `:new [Array]` (`[]`) Methods on `source` only.
-      #   * `:is_compatible [Boolean]` true when all `fragment`'s methods are present on `source`.
+      #   * `:new [Array]` (`[]`) Methods on `origin` only.
+      #   * `:is_compatible [Boolean]` true when all `fragment`'s methods are present on `origin`.
       #
-      # @example Analyze when uncompatible `fragment` because of `source` missing fields.
+      # @example Analyze when uncompatible `fragment` because of `origin` missing fields.
       #   AeEasy::Core.analyze_compatibility [1,2,3,4,5], [1,2,6]
       #   # => {missing: [6], new: [3,4,5], is_compatible: false}
       #
       # @example Analyze when compatible.
       #   AeEasy::Core.analyze_compatibility [1,2,3,4,5], [1,2,3]
       #   # => {missing: [], new: [4,5], is_compatible: true}
-      def analyze_compatibility source, fragment
-        intersection = source & fragment
+      def analyze_compatibility origin, fragment
+        intersection = origin & fragment
         {
           missing: fragment - intersection,
-          new: source - intersection,
+          new: origin - intersection,
           is_compatible: (intersection.count == fragment.count)
         }
       end

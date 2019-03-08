@@ -642,7 +642,6 @@ describe 'fake db' do
           Timecop.return
         end
 
-
         it 'should build page without options' do
           page = {
             'gid' => 'abc',
@@ -948,6 +947,22 @@ describe 'fake db' do
         refute_equal '', data['scraper_name'].strip
         assert_equal scraper_name, data['scraper_name']
         assert_equal 'active', data['status']
+      end
+
+      it 'should create new job when an output is inserted' do
+        assert_equal 1, @db.jobs.count
+        @db.enable_job_id_override
+        @db.outputs << {'_job_id' => 222, 'aaa' => 'AAA'}
+        assert_equal 2, @db.jobs.count
+        assert_equal 222, @db.jobs.last['job_id']
+      end
+
+      it 'should create new job when a page is inserted' do
+        assert_equal 1, @db.jobs.count
+        @db.enable_job_id_override
+        @db.pages << {'job_id' => 333, 'url' => 'http://www.example.com'}
+        assert_equal 2, @db.jobs.count
+        assert_equal 333, @db.jobs.last['job_id']
       end
     end
 

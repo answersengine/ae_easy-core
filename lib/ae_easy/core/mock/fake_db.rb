@@ -380,6 +380,9 @@ module AeEasy
             end
             item
           end
+          collection.bind_event(:after_insert) do |collection, item|
+            ensure_job item['job_id']
+          end
           @pages ||= collection
         end
 
@@ -424,7 +427,7 @@ module AeEasy
             item
           end
           collection.bind_event(:after_insert) do |collection, item|
-            ensure item['job_id']
+            ensure_job item['_job_id']
           end
           @outputs ||= collection
         end

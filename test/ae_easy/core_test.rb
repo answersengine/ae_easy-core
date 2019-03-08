@@ -138,7 +138,11 @@ describe 'ae_easy-core' do
           'ggg': {
             hhh: '888'
           }
-        }
+        },
+        jjj: [
+          {'kkk' => 111},
+          {lll: {mmm: 'MMM'}}
+        ]
       },
       _iii: 'III'
     }
@@ -153,7 +157,11 @@ describe 'ae_easy-core' do
           'ggg' => {
             'hhh' => '888'
           }
-        }
+        },
+        'jjj' => [
+          {'kkk' => 111},
+          {'lll' => {'mmm' => 'MMM'}}
+        ]
       },
       '_iii' => 'III'
     }

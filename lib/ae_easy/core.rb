@@ -209,12 +209,21 @@ module AeEasy
       #
       # @return [Hash]
       def deep_stringify_keys hash, should_clone = true
+        return hash unless hash.is_a? Hash
         pair_collection = hash.map{|k,v| [k.to_s,v]}
         target = should_clone ? {} : hash
         target.clear
         pair_collection.each do |pair|
           key, value = pair
-          target[key] = value.is_a?(Hash) ? deep_stringify_keys(value, should_clone) : value
+          if value.is_a? Array
+            array = []
+            value.each do |item|
+              array << deep_stringify_keys(item, should_clone)
+            end
+            target[key] = array
+            next
+          end
+          target[key] = deep_stringify_keys(value, should_clone)
         end
         target
       end

@@ -11,6 +11,6 @@ Install gem:
 ```gem install 'ae_easy-core'```
 
 Require gem:
-```require 'ae_easy-core'```
+```require 'ae_easy/core'```
 
 Documentation can be found [here](http://rubydoc.org/gems/ae_easy-core/frames).

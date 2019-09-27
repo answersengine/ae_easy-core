@@ -172,7 +172,7 @@ describe 'smart collection' do
       collection = AeEasy::Core::SmartCollection.new keys
       values.each{|i|collection << i}
       data = collection.find_match filter
-      assert_equal nil, data
+      assert_nil data
     end
 
     it 'should raise error on bind event when unknown event' do
@@ -275,7 +275,7 @@ describe 'smart collection' do
           executed = true
           assert_equal [], collection
           assert_equal expected_before_insert, item
-          assert_equal nil, match
+          assert_nil match
           item['ccc'] = 333
           item['ddd'] = 'DDD'
           item
@@ -512,7 +512,7 @@ describe 'smart collection' do
           executed = true
           assert_equal [], collection
           assert_equal expected_before_insert, item
-          assert_equal nil, match
+          assert_nil match
           # Replace item
           {'id' => 2, 'eee' => 555}
         end

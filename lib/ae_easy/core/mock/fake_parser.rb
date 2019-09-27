@@ -20,7 +20,9 @@ module AeEasy
             :save_pages,
             :save_outputs,
             :find_output,
-            :find_outputs
+            :find_outputs,
+            :refetch,
+            :reparse
           ].freeze
           AeEasy::Core::Mock::FakeExecutor.check_compatibility real_methods, mock_methods
           mock_methods

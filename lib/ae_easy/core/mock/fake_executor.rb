@@ -139,6 +139,29 @@ module AeEasy
           @page = value
         end
 
+        # Refetch self page flag.
+        # @return [Boollean]
+        # @note It is stronger than #reparse_self flag.
+        def refetch_self
+          @refetch_self ||= false
+        end
+
+        # Set refetch self page flag.
+        def refetch_self= value
+          @refetch_self = value
+        end
+
+        # Reparse self page flag.
+        # @return [Boollean]
+        def reparse_self
+          @reparse_self ||= false
+        end
+
+        # Set reparse self page flag.
+        def reparse_self= value
+          @reparse_self = value
+        end
+
         # Retrive a list of saved jobs.
         def saved_jobs
           db.jobs
@@ -179,6 +202,19 @@ module AeEasy
           list.clear
         end
 
+        # Execute any action applied to current page
+        def flush_self_actions
+          # Save page current page before refetch/reparse
+          if refetch_self || reparse_self
+            temp_page_gid_override = !db.allow_page_gid_override?
+            db.enable_page_gid_override if temp_page_gid_override
+            save_pages [page]
+            db.disable_page_gid_override if temp_page_gid_override
+          end
+          db.refetch(page['job_id'], page['gid']) if refetch_self
+          db.reparse(page['job_id'], page['gid']) if reparse_self
+        end
+
         # Save draft pages into db and clear draft queue.
         def flush_pages
           save_pages pages
@@ -195,6 +231,7 @@ module AeEasy
         def flush
           flush_pages
           flush_outputs
+          flush_self_actions
         end
 
         # Get latest job by scraper_name.
@@ -305,6 +342,30 @@ module AeEasy
         def execute_script file_path, vars = {}
           eval(File.read(file_path), isolated_binding(vars), file_path)
           flush
+        end
+
+        # Refetch a page by gid.
+        #
+        # @param [String] gid Page's gid to refetch.
+        def refetch gid
+          raise ArgumentError.new("gid needs to be a String.") unless gid.is_a?(String)
+          if page['gid'] == gid
+            self.refetch_self = true
+            return
+          end
+          db.refetch(job_id, gid)
+        end
+
+        # Reparse a page by gid.
+        #
+        # @param [String] page_gid Page's gid to reparse.
+        def reparse page_gid
+          raise ArgumentError.new("page_gid needs to be a String.") unless page_gid.is_a?(String)
+          if page['gid'] == page_gid
+            self.reparse_self = true
+            return
+          end
+          db.reparse(job_id, page_gid)
         end
       end
     end

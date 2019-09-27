@@ -8,6 +8,8 @@ require 'ae_easy/core/plugin/parser_behavior'
 require 'ae_easy/core/plugin/parser'
 require 'ae_easy/core/plugin/seeder_behavior'
 require 'ae_easy/core/plugin/seeder'
+require 'ae_easy/core/plugin/finisher_behavior'
+require 'ae_easy/core/plugin/finisher'
 
 module AeEasy
   module Core

@@ -148,6 +148,11 @@ describe 'fake db' do
       refute db.allow_job_id_override?
     end
 
+    it 'should generate time stamp correctly' do
+      time = Time.new 2019, 9, 10, 20, 15, 1
+      assert_equal '2019-09-10T20:15:01Z', AeEasy::Core::Mock::FakeDb.time_stamp(time)
+    end
+
     describe 'instance' do
       before do
         @db = AeEasy::Core::Mock::FakeDb.new
@@ -263,6 +268,7 @@ describe 'fake db' do
         expected_keys = [
           'url',
           'job_id',
+          'status',
           'method',
           'headers',
           'fetch_type',
@@ -270,18 +276,20 @@ describe 'fake db' do
           'no_redirect',
           'body',
           'ua_type',
+          'no_url_encode',
+          'http2',
           'vars'
         ]
         data = @db.page_defaults
         assert_equal expected_keys.sort, data.keys.sort
-        assert_equal nil, data['url']
+        assert_nil data['url']
         assert_equal @db.job_id, data['job_id'].call({})
         assert_equal 'GET', data['method']
         assert_equal({}, data['headers'])
         assert_equal 'standard', data['fetch_type']
-        assert_equal nil, data['cookie']
+        assert_nil data['cookie']
         assert_equal false, data['no_redirect']
-        assert_equal nil, data['body']
+        assert_nil data['body']
         assert_equal 'desktop', data['ua_type']
         assert_equal({}, data['vars'])
       end
@@ -400,12 +408,15 @@ describe 'fake db' do
           cookie: 'bbb=BBB',
           no_redirect: true,
           body: 'aaa=AAA',
-          ua_type: 'mobile'
+          ua_type: 'mobile',
+          no_url_encode: true,
+          http2: true
         }
         @db.pages << input_page
         expected = [{
           'gid' => @db.pages.first['gid'],
           'job_id' => @db.job_id,
+          'status' => 'to_fetch',
           'url' => 'https://www.example.com/abc',
           'method' => 'POST',
           'headers' => {
@@ -416,6 +427,8 @@ describe 'fake db' do
           'no_redirect' => true,
           'body' => 'aaa=AAA',
           'ua_type' => 'mobile',
+          'no_url_encode' => true,
+          'http2' => true,
           'vars' => {}
         }]
         assert_equal expected, @db.pages
@@ -452,6 +465,7 @@ describe 'fake db' do
         expected = [{
           'gid' => @db.pages.first['gid'],
           'job_id' => @db.job_id,
+          'status' => 'to_fetch',
           'url' => 'https://www.example.com/abc',
           'method' => 'GET',
           'headers' => {
@@ -462,6 +476,8 @@ describe 'fake db' do
           'no_redirect' => false,
           'body' => nil,
           'ua_type' => 'desktop',
+          'no_url_encode' => false,
+          'http2' => false,
           'vars' => {}
         }]
         assert_operator @db.pages.count, :==, 1
@@ -509,6 +525,7 @@ describe 'fake db' do
         expected = [{
           'gid' => '555',
           'job_id' => @db.job_id,
+          'status' => 'to_fetch',
           'url' => 'https://www.example.com/bbb',
           'method' => 'GET',
           'headers' => {},
@@ -517,6 +534,8 @@ describe 'fake db' do
           'no_redirect' => false,
           'body' => nil,
           'ua_type' => 'desktop',
+          'no_url_encode' => false,
+          'http2' => false,
           'vars' => {}
         }]
         assert_equal expected, @db.pages
@@ -655,6 +674,7 @@ describe 'fake db' do
           expected = {
             'gid' => 'abc',
             'job_id' => @db.job_id,
+            'status' => 'to_fetch',
             'url' => 'https://vvv.com',
             'method' => 'POST',
             'headers' => {},
@@ -663,6 +683,8 @@ describe 'fake db' do
             'no_redirect' => false,
             'body' => nil,
             'ua_type' => 'desktop',
+            'no_url_encode' => false,
+            'http2' => false,
             'vars' => {
               'aaa' => 'AAA'
             }
@@ -675,6 +697,7 @@ describe 'fake db' do
           expected = {
             'gid' => data['gid'],
             'job_id' => @db.job_id,
+            'status' => 'to_fetch',
             'url' => 'https://example.com',
             'method' => 'GET',
             'headers' => {},
@@ -683,6 +706,8 @@ describe 'fake db' do
             'no_redirect' => false,
             'body' => nil,
             'ua_type' => 'desktop',
+            'no_url_encode' => false,
+            'http2' => false,
             'vars' => {}
           }
           assert_equal expected, data
@@ -908,6 +933,372 @@ describe 'fake db' do
             'bbb' => 'BBB'
           )]
           assert_equal expected, @db.outputs
+        end
+
+        it 'should refetch correctly' do
+          assert_empty @db.pages
+          input_page = {
+            gid: '111',
+            url: 'https://www.example.com/abc',
+            status: 'parsed',
+            method: 'POST',
+            headers: {
+              Cookie: 'abc=123'
+            },
+            fetch_type: 'browser',
+            cookie: 'bbb=BBB',
+            no_redirect: true,
+            body: 'aaa=AAA',
+            ua_type: 'mobile',
+            no_url_encode: true,
+            http2: true,
+            freshness: '2019-01-20T10:20:30Z',
+            to_fetch: '2019-01-20T10:20:30Z',
+            fetching_at: '2009-01-20T10:25:45Z',
+            fetched_at: '2009-01-20T10:26:25Z',
+            fetching_try_count: 2,
+            effective_url: 'https://www.example.com/abc',
+            parsing_at: '2019-01-20T10:26:50Z',
+            parsing_failed_at: '2019-01-20T10:26:30Z',
+            parsed_at: '2019-01-20T10:26:55Z',
+            parsing_try_count: 3,
+            parsing_fail_count: 2,
+            parsing_updated_at: '2019-01-20T10:26:55Z',
+            response_checksum: '123abc',
+            response_status: '200 OK',
+            response_status_code: '200',
+            response_headers: {
+              "Connection" => [
+                "keep-alive",
+                "Transfer-Encoding"
+              ],
+              "Content-Encoding" => [
+                "gzip"
+              ]
+            },
+            response_cookie: 'aaa=111',
+            response_proto: 'HTTP/1.1',
+            content_type: 'text/html; charset=UTF-8',
+            content_size: 48126,
+            failed_response_status_code: 500,
+            failed_response_headers: {
+              "Connection" => [
+                "Transfer-Encoding"
+              ],
+              "Content-Encoding" => [
+                "gzip"
+              ]
+            },
+            failed_response_cookie: 'bbb=222',
+            failed_effective_url: 'https://www.example.com/abc',
+            failed_at: '2009-01-20T10:23:11Z',
+            failed_content_type: 'text/html; charset=UTF-8'
+          }
+          @db.pages << input_page
+
+          # Validate page before refetch
+          gid = @db.pages.first['gid']
+          job_id = @db.job_id
+          expected_before_refetch = [{
+            'gid' => gid,
+            'job_id' => job_id,
+            'status' => 'parsed',
+            'url' => 'https://www.example.com/abc',
+            'method' => 'POST',
+            'headers' => {
+              'Cookie' => 'abc=123'
+            },
+            'fetch_type' => 'browser',
+            'cookie' => 'bbb=BBB',
+            'no_redirect' => true,
+            'body' => 'aaa=AAA',
+            'ua_type' => 'mobile',
+            'no_url_encode' => true,
+            'http2' => true,
+            'vars' => {},
+            'freshness' => '2019-01-20T10:20:30Z',
+            'to_fetch' => '2019-01-20T10:20:30Z',
+            'fetching_at' => '2009-01-20T10:25:45Z',
+            'fetched_at' => '2009-01-20T10:26:25Z',
+            'fetching_try_count' => 2,
+            'effective_url' => 'https://www.example.com/abc',
+            'parsing_at' => '2019-01-20T10:26:50Z',
+            'parsing_failed_at' => '2019-01-20T10:26:30Z',
+            'parsed_at' => '2019-01-20T10:26:55Z',
+            'parsing_try_count' => 3,
+            'parsing_fail_count' => 2,
+            'parsing_updated_at' => '2019-01-20T10:26:55Z',
+            'response_checksum' => '123abc',
+            'response_status' => '200 OK',
+            'response_status_code' => '200',
+            'response_headers' => {
+              "Connection" => [
+                "keep-alive",
+                "Transfer-Encoding"
+              ],
+              "Content-Encoding" => [
+                "gzip"
+              ]
+            },
+            'response_cookie' => 'aaa=111',
+            'response_proto' => 'HTTP/1.1',
+            'content_type' => 'text/html; charset=UTF-8',
+            'content_size' => 48126,
+            'failed_response_status_code' => 500,
+            'failed_response_headers' => {
+              "Connection" => [
+                "Transfer-Encoding"
+              ],
+              "Content-Encoding" => [
+                "gzip"
+              ]
+            },
+            'failed_response_cookie' => 'bbb=222',
+            'failed_effective_url' => 'https://www.example.com/abc',
+            'failed_at' => '2009-01-20T10:23:11Z',
+            'failed_content_type' => 'text/html; charset=UTF-8'
+          }]
+          assert_equal expected_before_refetch, @db.pages
+
+          # Validate page after refetch
+          @db.refetch job_id, gid
+          expected_after_refetch = [{
+            'gid' => gid,
+            'job_id' => job_id,
+            'status' => 'to_fetch',
+            'url' => 'https://www.example.com/abc',
+            'method' => 'POST',
+            'headers' => {
+              'Cookie' => 'abc=123'
+            },
+            'fetch_type' => 'browser',
+            'cookie' => 'bbb=BBB',
+            'no_redirect' => true,
+            'body' => 'aaa=AAA',
+            'ua_type' => 'mobile',
+            'no_url_encode' => true,
+            'http2' => true,
+            'vars' => {},
+
+            'freshness' => @time.utc.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'to_fetch' => @time.utc.strftime('%Y-%m-%dT%H:%M:%SZ'),
+            'fetched_from' => nil,
+            'fetching_at' => '2001-01-01T00:00:00Z',
+            'fetched_at' => nil,
+            'fetching_try_count' => 0,
+            'effective_url' => nil,
+            'parsing_at' => nil,
+            'parsing_failed_at' => nil,
+            'parsed_at' => nil,
+            'parsing_try_count' => 0,
+            'parsing_fail_count' => 0,
+            'parsing_updated_at' => '2001-01-01T00:00:00Z',
+            'response_checksum' => nil,
+            'response_status' => nil,
+            'response_status_code' => nil,
+            'response_headers' => nil,
+            'response_cookie' => nil,
+            'response_proto' => nil,
+            'content_type' => nil,
+            'content_size' => 0,
+            'failed_response_status_code' => nil,
+            'failed_response_headers' => nil,
+            'failed_response_cookie' => nil,
+            'failed_effective_url' => nil,
+            'failed_at' => nil,
+            'failed_content_type' => nil,
+          }]
+          assert_equal expected_after_refetch, @db.pages
+        end
+
+        it 'should reparse correctly' do
+          assert_empty @db.pages
+          input_page = {
+            gid: '111',
+            url: 'https://www.example.com/abc',
+            status: 'parsed',
+            method: 'POST',
+            headers: {
+              Cookie: 'abc=123'
+            },
+            fetch_type: 'browser',
+            cookie: 'bbb=BBB',
+            no_redirect: true,
+            body: 'aaa=AAA',
+            ua_type: 'mobile',
+            no_url_encode: true,
+            http2: true,
+            freshness: '2019-01-20T10:20:30Z',
+            to_fetch: '2019-01-20T10:20:30Z',
+            fetching_at: '2009-01-20T10:25:45Z',
+            fetched_at: '2009-01-20T10:26:25Z',
+            fetching_try_count: 2,
+            effective_url: 'https://www.example.com/abc',
+            parsing_at: '2019-01-20T10:26:50Z',
+            parsing_failed_at: '2019-01-20T10:26:30Z',
+            parsed_at: '2019-01-20T10:26:55Z',
+            parsing_try_count: 3,
+            parsing_fail_count: 2,
+            parsing_updated_at: '2019-01-20T10:26:55Z',
+            response_checksum: '123abc',
+            response_status: '200 OK',
+            response_status_code: '200',
+            response_headers: {
+              "Connection" => [
+                "keep-alive",
+                "Transfer-Encoding"
+              ],
+              "Content-Encoding" => [
+                "gzip"
+              ]
+            },
+            response_cookie: 'aaa=111',
+            response_proto: 'HTTP/1.1',
+            content_type: 'text/html; charset=UTF-8',
+            content_size: 48126,
+            failed_response_status_code: 500,
+            failed_response_headers: {
+              "Connection" => [
+                "Transfer-Encoding"
+              ],
+              "Content-Encoding" => [
+                "gzip"
+              ]
+            },
+            failed_response_cookie: 'bbb=222',
+            failed_effective_url: 'https://www.example.com/abc',
+            failed_at: '2009-01-20T10:23:11Z',
+            failed_content_type: 'text/html; charset=UTF-8',
+          }
+          @db.pages << input_page
+
+          # Validate page before reparse
+          gid = @db.pages.first['gid']
+          job_id = @db.job_id
+          expected_before_reparse = [{
+            'gid' => gid,
+            'job_id' => job_id,
+            'status' => 'parsed',
+            'url' => 'https://www.example.com/abc',
+            'method' => 'POST',
+            'headers' => {
+              'Cookie' => 'abc=123'
+            },
+            'fetch_type' => 'browser',
+            'cookie' => 'bbb=BBB',
+            'no_redirect' => true,
+            'body' => 'aaa=AAA',
+            'ua_type' => 'mobile',
+            'no_url_encode' => true,
+            'http2' => true,
+            'vars' => {},
+            'freshness' => '2019-01-20T10:20:30Z',
+            'to_fetch' => '2019-01-20T10:20:30Z',
+            'fetching_at' => '2009-01-20T10:25:45Z',
+            'fetched_at' => '2009-01-20T10:26:25Z',
+            'fetching_try_count' => 2,
+            'effective_url' => 'https://www.example.com/abc',
+            'parsing_at' => '2019-01-20T10:26:50Z',
+            'parsing_failed_at' => '2019-01-20T10:26:30Z',
+            'parsed_at' => '2019-01-20T10:26:55Z',
+            'parsing_try_count' => 3,
+            'parsing_fail_count' => 2,
+            'parsing_updated_at' => '2019-01-20T10:26:55Z',
+            'response_checksum' => '123abc',
+            'response_status' => '200 OK',
+            'response_status_code' => '200',
+            'response_headers' => {
+              "Connection" => [
+                "keep-alive",
+                "Transfer-Encoding"
+              ],
+              "Content-Encoding" => [
+                "gzip"
+              ]
+            },
+            'response_cookie' => 'aaa=111',
+            'response_proto' => 'HTTP/1.1',
+            'content_type' => 'text/html; charset=UTF-8',
+            'content_size' => 48126,
+            'failed_response_status_code' => 500,
+            'failed_response_headers' => {
+              "Connection" => [
+                "Transfer-Encoding"
+              ],
+              "Content-Encoding" => [
+                "gzip"
+              ]
+            },
+            'failed_response_cookie' => 'bbb=222',
+            'failed_effective_url' => 'https://www.example.com/abc',
+            'failed_at' => '2009-01-20T10:23:11Z',
+            'failed_content_type' => 'text/html; charset=UTF-8'
+          }]
+          assert_equal expected_before_reparse, @db.pages
+
+          # Validate page after reparse
+          @db.reparse job_id, gid
+          expected_after_reparse = [{
+            'gid' => gid,
+            'job_id' => job_id,
+            'status' => 'to_parse',
+            'url' => 'https://www.example.com/abc',
+            'method' => 'POST',
+            'headers' => {
+              'Cookie' => 'abc=123'
+            },
+            'fetch_type' => 'browser',
+            'cookie' => 'bbb=BBB',
+            'no_redirect' => true,
+            'body' => 'aaa=AAA',
+            'ua_type' => 'mobile',
+            'no_url_encode' => true,
+            'http2' => true,
+            'vars' => {},
+
+            'freshness' => '2019-01-20T10:20:30Z',
+            'to_fetch' => '2019-01-20T10:20:30Z',
+            'fetching_at' => '2009-01-20T10:25:45Z',
+            'fetched_at' => '2009-01-20T10:26:25Z',
+            'fetching_try_count' => 2,
+            'effective_url' => 'https://www.example.com/abc',
+            'parsing_at' => nil,
+            'parsing_failed_at' => nil,
+            'parsed_at' => nil,
+            'parsing_try_count' => 0,
+            'parsing_fail_count' => 0,
+            'parsing_updated_at' => '2001-01-01T00:00:00Z',
+            'response_checksum' => '123abc',
+            'response_status' => '200 OK',
+            'response_status_code' => '200',
+            'response_headers' => {
+              "Connection" => [
+                "keep-alive",
+                "Transfer-Encoding"
+              ],
+              "Content-Encoding" => [
+                "gzip"
+              ]
+            },
+            'response_cookie' => 'aaa=111',
+            'response_proto' => 'HTTP/1.1',
+            'content_type' => 'text/html; charset=UTF-8',
+            'content_size' => 48126,
+            'failed_response_status_code' => 500,
+            'failed_response_headers' => {
+              "Connection" => [
+                "Transfer-Encoding"
+              ],
+              "Content-Encoding" => [
+                "gzip"
+              ]
+            },
+            'failed_response_cookie' => 'bbb=222',
+            'failed_effective_url' => 'https://www.example.com/abc',
+            'failed_at' => '2009-01-20T10:23:11Z',
+            'failed_content_type' => 'text/html; charset=UTF-8'
+          }]
+          assert_equal expected_after_reparse, @db.pages
         end
       end
     end

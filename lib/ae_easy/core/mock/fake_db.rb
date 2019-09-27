@@ -152,6 +152,16 @@ module AeEasy
           build_job job, opts
         end
 
+        # Return a timestamp
+        #
+        # @param [Time] time (nil) Time from which to get time stamp.
+        #
+        # @return [String]
+        def self.time_stamp time = nil
+          time = Time.new if time.nil?
+          time.utc.strftime('%Y-%m-%dT%H:%M:%SZ')
+        end
+
         # Get current job or create new one from values.
         #
         # @param [Integer] target_job_id (nil) Job id to ensure existance.
@@ -345,6 +355,7 @@ module AeEasy
         def page_defaults
           @page_defaults ||= {
             'url' => nil,
+            'status' => 'to_fetch',
             'job_id' => lambda{|page| job_id},
             'method' => 'GET',
             'headers' => {},
@@ -353,6 +364,8 @@ module AeEasy
             'no_redirect' => false,
             'body' => nil,
             'ua_type' => 'desktop',
+            'no_url_encode' => false,
+            'http2' => false,
             'vars' => {}
           }
         end
@@ -404,7 +417,7 @@ module AeEasy
           @output_defaults ||= {
             '_collection' => DEFAULT_COLLECTION,
             '_job_id' => lambda{|output| job_id},
-            '_created_at' => lambda{|output| Time.new.strftime('%Y-%m-%dT%H:%M:%SZ')},
+            '_created_at' => lambda{|output| self.class.time_stamp},
             '_gid' => lambda{|output| page_gid}
           }
         end
@@ -488,6 +501,59 @@ module AeEasy
             matches << item
           end
           matches
+        end
+
+        # Refetch a page.
+        #
+        # @param [Integer] job_id Page's job_id to refetch.
+        # @param [String] gid Page's gid to refetch.
+        def refetch job_id, gid
+          page = pages.find_match('gid' => gid, 'job_id' => job_id)
+          raise Exception.new("Page not found with job_id \"#{job_id}\" gid \"#{gid}\"") if page.nil?
+          page['status'] = 'to_fetch'
+          page['freshness'] = self.class.time_stamp
+          page['to_fetch'] = self.class.time_stamp
+          page['fetched_from'] = nil
+          page['fetching_at'] = '2001-01-01T00:00:00Z'
+          page['fetched_at'] = nil
+          page['fetching_try_count'] = 0
+          page['effective_url'] = nil
+          page['parsing_at'] = nil
+          page['parsing_failed_at'] = nil
+          page['parsed_at'] = nil
+          page['parsing_try_count'] = 0
+          page['parsing_fail_count'] = 0
+          page['parsing_updated_at'] = '2001-01-01T00:00:00Z'
+          page['response_checksum'] = nil
+          page['response_status'] = nil
+          page['response_status_code'] = nil
+          page['response_headers'] = nil
+          page['response_cookie'] = nil
+          page['response_proto'] = nil
+          page['content_type'] = nil
+          page['content_size'] = 0
+          page['failed_response_status_code'] = nil
+          page['failed_response_headers'] = nil
+          page['failed_response_cookie'] = nil
+          page['failed_effective_url'] = nil
+          page['failed_at'] = nil
+          page['failed_content_type'] = nil
+        end
+
+        # Reparse a page.
+        #
+        # @param [Integer] job_id Page's job_id to reparse.
+        # @param [String] gid Page's gid to reparse.
+        def reparse job_id, gid
+          page = pages.find_match('gid' => gid, 'job_id' => job_id)
+          raise Exception.new("Page not found with job_id \"#{job_id}\" gid \"#{gid}\"") if page.nil?
+          page['status'] = 'to_parse'
+          page['parsing_at'] = nil
+          page['parsing_failed_at'] = nil
+          page['parsing_updated_at'] = '2001-01-01T00:00:00Z'
+          page['parsed_at'] = nil
+          page['parsing_try_count'] = 0
+          page['parsing_fail_count'] = 0
         end
       end
     end

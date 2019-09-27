@@ -6,7 +6,7 @@
 <title>
   Class: AeEasy::Core::Mock::FakeDb
   
-    &mdash; Documentation by YARD 0.9.18
+    &mdash; Documentation by YARD 0.9.20
   
 </title>
 
@@ -410,6 +410,30 @@ query string.</p>
   
     <span class="summary_desc"><div class='inline'>
 <p>Generate a fake UUID based on output fields without `_` prefix.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#time_stamp-class_method" title="time_stamp (class method)">.<strong>time_stamp</strong>(time = nil)  &#x21d2; String </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Return a timestamp.</p>
 </div></span>
   
 </li>
@@ -912,6 +936,54 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
         <li class="public ">
   <span class="summary_signature">
     
+      <a href="#refetch-instance_method" title="#refetch (instance method)">#<strong>refetch</strong>(job_id, gid)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Refetch a page.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#reparse-instance_method" title="#reparse (instance method)">#<strong>reparse</strong>(job_id, gid)  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Reparse a page.</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
       <a href="#scraper_name-instance_method" title="#scraper_name (instance method)">#<strong>scraper_name</strong>  &#x21d2; String<sup>?</sup> </a>
     
 
@@ -1091,16 +1163,16 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-256
-257
-258
-259
-260
-261
-262</pre>
+266
+267
+268
+269
+270
+271
+272</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 256</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 266</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span> <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_job_id'>job_id</span> <span class='op'>=</span> <span class='id identifier rubyid_opts'>opts</span><span class='lbracket'>[</span><span class='symbol'>:job_id</span><span class='rbracket'>]</span>
@@ -1926,6 +1998,84 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
 </table>
 </div>
     
+      <div class="method_details ">
+  <h3 class="signature " id="time_stamp-class_method">
+  
+    .<strong>time_stamp</strong>(time = nil)  &#x21d2; <tt>String</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Return a timestamp</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>time</span>
+      
+      
+        <span class='type'>(<tt>Time</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>nil</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>(nil) Time from which to get time stamp.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Returns:</p>
+<ul class="return">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+160
+161
+162
+163</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 160</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_time_stamp'>time_stamp</span> <span class='id identifier rubyid_time'>time</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_time'>time</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span> <span class='kw'>if</span> <span class='id identifier rubyid_time'>time</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_time'>time</span><span class='period'>.</span><span class='id identifier rubyid_utc'>utc</span><span class='period'>.</span><span class='id identifier rubyid_strftime'>strftime</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>%Y-%m-%dT%H:%M:%SZ</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
   </div>
 
   <div id="instance_method_details" class="method_details_list">
@@ -1979,12 +2129,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-242
-243
-244</pre>
+252
+253
+254</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 242</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 252</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_allow_job_id_override?'>allow_job_id_override?</span>
   <span class='ivar'>@allow_job_id_override</span> <span class='op'>||=</span> <span class='kw'>false</span>
@@ -2041,12 +2191,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-224
-225
-226</pre>
+234
+235
+236</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 224</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 234</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_allow_page_gid_override?'>allow_page_gid_override?</span>
   <span class='ivar'>@allow_page_gid_override</span> <span class='op'>||=</span> <span class='kw'>false</span>
@@ -2082,12 +2232,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-234
-235
-236</pre>
+244
+245
+246</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 234</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 244</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_disable_job_id_override'>disable_job_id_override</span>
   <span class='ivar'>@allow_job_id_override</span> <span class='op'>=</span> <span class='kw'>false</span>
@@ -2123,12 +2273,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-216
-217
-218</pre>
+226
+227
+228</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 216</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 226</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_disable_page_gid_override'>disable_page_gid_override</span>
   <span class='ivar'>@allow_page_gid_override</span> <span class='op'>=</span> <span class='kw'>false</span>
@@ -2164,12 +2314,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-229
-230
-231</pre>
+239
+240
+241</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 229</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 239</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_enable_job_id_override'>enable_job_id_override</span>
   <span class='ivar'>@allow_job_id_override</span> <span class='op'>=</span> <span class='kw'>true</span>
@@ -2205,12 +2355,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-211
-212
-213</pre>
+221
+222
+223</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 211</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 221</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_enable_page_gid_override'>enable_page_gid_override</span>
   <span class='ivar'>@allow_page_gid_override</span> <span class='op'>=</span> <span class='kw'>true</span>
@@ -2281,21 +2431,21 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-160
-161
-162
-163
-164
-165
-166
-167
-168
-169
 170
-171</pre>
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 160</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 170</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ensure_job'>ensure_job</span> <span class='id identifier rubyid_target_job_id'>target_job_id</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='id identifier rubyid_target_job_id'>target_job_id</span> <span class='op'>=</span> <span class='id identifier rubyid_job_id'>job_id</span> <span class='kw'>if</span> <span class='id identifier rubyid_target_job_id'>target_job_id</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -2353,12 +2503,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-274
-275
-276</pre>
+284
+285
+286</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 274</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 284</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_job_id'>generate_job_id</span>
   <span class='id identifier rubyid_jobs'>jobs</span><span class='period'>.</span><span class='id identifier rubyid_count'>count</span> <span class='op'>&lt;</span> <span class='int'>1</span> <span class='op'>?</span> <span class='int'>1</span> <span class='op'>:</span> <span class='lparen'>(</span><span class='id identifier rubyid_jobs'>jobs</span><span class='period'>.</span><span class='id identifier rubyid_max'>max</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='comma'>,</span><span class='id identifier rubyid_b'>b</span><span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>job_id</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>&lt;=&gt;</span> <span class='id identifier rubyid_b'>b</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>job_id</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>job_id</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>+</span> <span class='int'>1</span><span class='rparen'>)</span>
@@ -2427,13 +2577,13 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-394
-395
-396
-397</pre>
+407
+408
+409
+410</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 394</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 407</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_output_id'>generate_output_id</span> <span class='id identifier rubyid_data'>data</span>
   <span class='comment'># Generate random UUID to match AnswersEngine behavior
@@ -2513,16 +2663,6 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-321
-322
-323
-324
-325
-326
-327
-328
-329
-330
 331
 332
 333
@@ -2531,10 +2671,20 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
 336
 337
 338
-339</pre>
+339
+340
+341
+342
+343
+344
+345
+346
+347
+348
+349</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 321</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 331</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_page_gid'>generate_page_gid</span> <span class='id identifier rubyid_page_data'>page_data</span>
   <span class='id identifier rubyid_fields'>fields</span> <span class='op'>=</span> <span class='lbracket'>[</span>
@@ -2599,12 +2749,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-267
-268
-269</pre>
+277
+278
+279</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 267</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 277</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_generate_scraper_name'>generate_scraper_name</span>
   <span class='const'>Faker</span><span class='op'>::</span><span class='const'>Internet</span><span class='period'>.</span><span class='id identifier rubyid_unique'>unique</span><span class='period'>.</span><span class='id identifier rubyid_slug'>slug</span>
@@ -2653,12 +2803,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-188
-189
-190</pre>
+198
+199
+200</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 188</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 198</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_job_id'>job_id</span>
   <span class='ivar'>@job_id</span> <span class='op'>||=</span> <span class='id identifier rubyid_generate_job_id'>generate_job_id</span>
@@ -2694,14 +2844,14 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-193
-194
-195
-196
-197</pre>
+203
+204
+205
+206
+207</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 193</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 203</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_job_id='>job_id=</span> <span class='id identifier rubyid_value'>value</span>
   <span class='ivar'>@job_id</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
@@ -2752,22 +2902,22 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-294
-295
-296
-297
-298
-299
-300
-301
-302
-303
 304
 305
-306</pre>
+306
+307
+308
+309
+310
+311
+312
+313
+314
+315
+316</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 294</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 304</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_jobs'>jobs</span>
   <span class='kw'>return</span> <span class='ivar'>@jobs</span> <span class='kw'>unless</span> <span class='ivar'>@jobs</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -2826,28 +2976,28 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-415
-416
-417
-418
-419
-420
-421
-422
-423
-424
-425
-426
-427
 428
 429
 430
 431
 432
-433</pre>
+433
+434
+435
+436
+437
+438
+439
+440
+441
+442
+443
+444
+445
+446</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 415</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 428</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_outputs'>outputs</span>
   <span class='kw'>return</span> <span class='ivar'>@outputs</span> <span class='kw'>unless</span> <span class='ivar'>@outputs</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -2912,12 +3062,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-201
-202
-203</pre>
+211
+212
+213</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 201</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 211</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_page_gid'>page_gid</span>
   <span class='ivar'>@page_gid</span> <span class='op'>||=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_fake_uuid'>fake_uuid</span>
@@ -2953,12 +3103,12 @@ fetch_type   * cookie   * no_redirect   * body   * ua_type.</p>
       <pre class="lines">
 
 
-206
-207
-208</pre>
+216
+217
+218</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 206</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 216</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_page_gid='>page_gid=</span> <span class='id identifier rubyid_value'>value</span>
   <span class='ivar'>@page_gid</span> <span class='op'>=</span> <span class='id identifier rubyid_value'>value</span>
@@ -3016,19 +3166,6 @@ gid overriding is enabled (see #allow_page_gid_override?)</p>
       <pre class="lines">
 
 
-367
-368
-369
-370
-371
-372
-373
-374
-375
-376
-377
-378
-379
 380
 381
 382
@@ -3036,10 +3173,23 @@ gid overriding is enabled (see #allow_page_gid_override?)</p>
 384
 385
 386
-387</pre>
+387
+388
+389
+390
+391
+392
+393
+394
+395
+396
+397
+398
+399
+400</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 367</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 380</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_pages'>pages</span>
   <span class='kw'>return</span> <span class='ivar'>@pages</span> <span class='kw'>unless</span> <span class='ivar'>@page</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -3192,19 +3342,6 @@ suites only.</p>
       <pre class="lines">
 
 
-462
-463
-464
-465
-466
-467
-468
-469
-470
-471
-472
-473
-474
 475
 476
 477
@@ -3221,10 +3358,23 @@ suites only.</p>
 488
 489
 490
-491</pre>
+491
+492
+493
+494
+495
+496
+497
+498
+499
+500
+501
+502
+503
+504</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 462</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 475</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_query'>query</span> <span class='id identifier rubyid_collection'>collection</span><span class='comma'>,</span> <span class='id identifier rubyid_filter'>filter</span><span class='comma'>,</span> <span class='id identifier rubyid_offset'>offset</span> <span class='op'>=</span> <span class='int'>0</span><span class='comma'>,</span> <span class='id identifier rubyid_limit'>limit</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='id identifier rubyid_limit'>limit</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span> <span class='op'>||</span> <span class='id identifier rubyid_limit'>limit</span> <span class='op'>&gt;</span> <span class='int'>0</span>
@@ -3255,6 +3405,260 @@ suites only.</p>
     <span class='id identifier rubyid_matches'>matches</span> <span class='op'>&lt;&lt;</span> <span class='id identifier rubyid_item'>item</span>
   <span class='kw'>end</span>
   <span class='id identifier rubyid_matches'>matches</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="refetch-instance_method">
+  
+    #<strong>refetch</strong>(job_id, gid)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Refetch a page.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>job_id</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Page&#39;s job_id to refetch.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>gid</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Page&#39;s gid to refetch.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Exception.html" title="AeEasy::Core::Exception (module)">Exception</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525
+526
+527
+528
+529
+530
+531
+532
+533
+534
+535
+536
+537
+538
+539
+540
+541</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 510</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_refetch'>refetch</span> <span class='id identifier rubyid_job_id'>job_id</span><span class='comma'>,</span> <span class='id identifier rubyid_gid'>gid</span>
+  <span class='id identifier rubyid_page'>page</span> <span class='op'>=</span> <span class='id identifier rubyid_pages'>pages</span><span class='period'>.</span><span class='id identifier rubyid_find_match'>find_match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>gid</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_gid'>gid</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>job_id</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_job_id'>job_id</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../Exception.html" title="AeEasy::Core::Exception (module)">Exception</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Page not found with job_id \&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_job_id'>job_id</span><span class='embexpr_end'>}</span><span class='tstring_content'>\&quot; gid \&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_gid'>gid</span><span class='embexpr_end'>}</span><span class='tstring_content'>\&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_page'>page</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>status</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>to_fetch</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>freshness</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_time_stamp'>time_stamp</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>to_fetch</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_class'>class</span><span class='period'>.</span><span class='id identifier rubyid_time_stamp'>time_stamp</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>fetched_from</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>fetching_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2001-01-01T00:00:00Z</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>fetched_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>fetching_try_count</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>effective_url</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsing_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsing_failed_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsed_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsing_try_count</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsing_fail_count</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsing_updated_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2001-01-01T00:00:00Z</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>response_checksum</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>response_status</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>response_status_code</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>response_headers</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>response_cookie</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>response_proto</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>content_type</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>content_size</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>failed_response_status_code</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>failed_response_headers</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>failed_response_cookie</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>failed_effective_url</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>failed_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>failed_content_type</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <h3 class="signature " id="reparse-instance_method">
+  
+    #<strong>reparse</strong>(job_id, gid)  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Reparse a page.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>job_id</span>
+      
+      
+        <span class='type'>(<tt>Integer</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Page&#39;s job_id to reparse.</p>
+</div>
+      
+    </li>
+  
+    <li>
+      
+        <span class='name'>gid</span>
+      
+      
+        <span class='type'>(<tt>String</tt>)</span>
+      
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>Page&#39;s gid to reparse.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+<p class="tag_title">Raises:</p>
+<ul class="raise">
+  
+    <li>
+      
+      
+        <span class='type'>(<tt><span class='object_link'><a href="../Exception.html" title="AeEasy::Core::Exception (module)">Exception</a></span></tt>)</span>
+      
+      
+      
+    </li>
+  
+</ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 547</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_reparse'>reparse</span> <span class='id identifier rubyid_job_id'>job_id</span><span class='comma'>,</span> <span class='id identifier rubyid_gid'>gid</span>
+  <span class='id identifier rubyid_page'>page</span> <span class='op'>=</span> <span class='id identifier rubyid_pages'>pages</span><span class='period'>.</span><span class='id identifier rubyid_find_match'>find_match</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>gid</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_gid'>gid</span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>job_id</span><span class='tstring_end'>&#39;</span></span> <span class='op'>=&gt;</span> <span class='id identifier rubyid_job_id'>job_id</span><span class='rparen'>)</span>
+  <span class='id identifier rubyid_raise'>raise</span> <span class='const'><span class='object_link'><a href="../Exception.html" title="AeEasy::Core::Exception (module)">Exception</a></span></span><span class='period'>.</span><span class='id identifier rubyid_new'>new</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Page not found with job_id \&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_job_id'>job_id</span><span class='embexpr_end'>}</span><span class='tstring_content'>\&quot; gid \&quot;</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_gid'>gid</span><span class='embexpr_end'>}</span><span class='tstring_content'>\&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>if</span> <span class='id identifier rubyid_page'>page</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>status</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>to_parse</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsing_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsing_failed_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsing_updated_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>2001-01-01T00:00:00Z</span><span class='tstring_end'>&#39;</span></span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsed_at</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsing_try_count</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
+  <span class='id identifier rubyid_page'>page</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>parsing_fail_count</span><span class='tstring_end'>&#39;</span></span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -3300,12 +3704,12 @@ suites only.</p>
       <pre class="lines">
 
 
-175
-176
-177</pre>
+185
+186
+187</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 175</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 185</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scraper_name'>scraper_name</span>
   <span class='ivar'>@scraper_name</span> <span class='op'>||=</span> <span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>my_scraper</span><span class='tstring_end'>&#39;</span></span>
@@ -3341,14 +3745,14 @@ suites only.</p>
       <pre class="lines">
 
 
-180
-181
-182
-183
-184</pre>
+190
+191
+192
+193
+194</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 180</span>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/mock/fake_db.rb', line 190</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scraper_name='>scraper_name=</span> <span class='id identifier rubyid_value'>value</span>
   <span class='id identifier rubyid_job'>job</span> <span class='op'>=</span> <span class='id identifier rubyid_ensure_job'>ensure_job</span>
@@ -3365,9 +3769,9 @@ suites only.</p>
 </div>
 
       <div id="footer">
-  Generated on Mon Mar 11 20:05:17 2019 by
+  Generated on Fri Sep 27 02:01:31 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
-  0.9.18 (ruby-2.5.3).
+  0.9.20 (ruby-2.5.3).
 </div>
 
     </div>

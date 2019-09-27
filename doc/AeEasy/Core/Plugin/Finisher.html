@@ -4,7 +4,7 @@
     <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>
-  Module: AeEasy::Core::Plugin::SeederBehavior
+  Module: AeEasy::Core::Plugin::Finisher
   
     &mdash; Documentation by YARD 0.9.20
   
@@ -15,7 +15,7 @@
   <link rel="stylesheet" href="../../../css/common.css" type="text/css" charset="utf-8" />
 
 <script type="text/javascript" charset="utf-8">
-  pathId = "AeEasy::Core::Plugin::SeederBehavior";
+  pathId = "AeEasy::Core::Plugin::Finisher";
   relpath = '../../../';
 </script>
 
@@ -36,10 +36,10 @@
       <div id="header">
         <div id="menu">
   
-    <a href="../../../_index.html">Index (S)</a> &raquo;
+    <a href="../../../_index.html">Index (F)</a> &raquo;
     <span class='title'><span class='object_link'><a href="../../../AeEasy.html" title="AeEasy (module)">AeEasy</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Core.html" title="AeEasy::Core (module)">Core</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../Plugin.html" title="AeEasy::Core::Plugin (module)">Plugin</a></span></span>
      &raquo; 
-    <span class="title">SeederBehavior</span>
+    <span class="title">Finisher</span>
   
 </div>
 
@@ -59,7 +59,7 @@
         <div class="clear"></div>
       </div>
 
-      <div id="content"><h1>Module: AeEasy::Core::Plugin::SeederBehavior
+      <div id="content"><h1>Module: AeEasy::Core::Plugin::Finisher
   
   
   
@@ -73,22 +73,17 @@
   
   <dl>
       <dt>Includes:</dt>
-      <dd><span class='object_link'><a href="ExecutorBehavior.html" title="AeEasy::Core::Plugin::ExecutorBehavior (module)">ExecutorBehavior</a></span></dd>
+      <dd><span class='object_link'><a href="FinisherBehavior.html" title="AeEasy::Core::Plugin::FinisherBehavior (module)">FinisherBehavior</a></span>, <span class='object_link'><a href="InitializeHook.html" title="AeEasy::Core::Plugin::InitializeHook (module)">InitializeHook</a></span></dd>
   </dl>
   
   
 
-  
-  <dl>
-    <dt>Included in:</dt>
-    <dd><span class='object_link'><a href="Seeder.html" title="AeEasy::Core::Plugin::Seeder (module)">Seeder</a></span></dd>
-  </dl>
   
 
   
   <dl>
     <dt>Defined in:</dt>
-    <dd>lib/ae_easy/core/plugin/seeder_behavior.rb</dd>
+    <dd>lib/ae_easy/core/plugin/finisher.rb</dd>
   </dl>
   
 </div>
@@ -105,6 +100,41 @@
   <p class="inherited"><span class='object_link'><a href="ContextIntegrator.html#context-instance_method" title="AeEasy::Core::Plugin::ContextIntegrator#context (method)">#context</a></span></p>
 
 
+  
+    <h2>
+      Instance Method Summary
+      <small><a href="#" class="summary_toggle">collapse</a></small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#initialize-instance_method" title="#initialize (instance method)">#<strong>initialize</strong>(opts = {})  &#x21d2; Object </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'>
+<p>Initialize finisher and hooks.</p>
+</div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
 
   
   
@@ -112,7 +142,13 @@
   
   
   
-  <h2>Method Summary</h2>
+  
+  
+  
+  
+  
+  
+  
   
   <h3 class="inherited">Methods included from <span class='object_link'><a href="ExecutorBehavior.html" title="AeEasy::Core::Plugin::ExecutorBehavior (module)">ExecutorBehavior</a></span></h3>
   <p class="inherited"><span class='object_link'><a href="ExecutorBehavior.html#enqueue-instance_method" title="AeEasy::Core::Plugin::ExecutorBehavior#enqueue (method)">#enqueue</a></span>, <span class='object_link'><a href="ExecutorBehavior.html#save-instance_method" title="AeEasy::Core::Plugin::ExecutorBehavior#save (method)">#save</a></span></p>
@@ -128,11 +164,98 @@
   <h3 class="inherited">Methods included from <span class='object_link'><a href="ContextIntegrator.html" title="AeEasy::Core::Plugin::ContextIntegrator (module)">ContextIntegrator</a></span></h3>
   <p class="inherited"><span class='object_link'><a href="ContextIntegrator.html#initialize_hook_core_context_integrator-instance_method" title="AeEasy::Core::Plugin::ContextIntegrator#initialize_hook_core_context_integrator (method)">#initialize_hook_core_context_integrator</a></span>, <span class='object_link'><a href="ContextIntegrator.html#mock_context-instance_method" title="AeEasy::Core::Plugin::ContextIntegrator#mock_context (method)">#mock_context</a></span></p>
 
+  
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="InitializeHook.html" title="AeEasy::Core::Plugin::InitializeHook (module)">InitializeHook</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="InitializeHook.html#initialize_hooks-instance_method" title="AeEasy::Core::Plugin::InitializeHook#initialize_hooks (method)">#initialize_hooks</a></span></p>
+
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+
+    
+      <div class="method_details first">
+  <h3 class="signature first" id="initialize-instance_method">
+  
+    #<strong>initialize</strong>(opts = {})  &#x21d2; <tt>Object</tt> 
+  
+
+  
+
+  
+</h3><div class="docstring">
+  <div class="discussion">
+    
+<p>Initialize finisher and hooks.</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  <p class="tag_title">Parameters:</p>
+<ul class="param">
+  
+    <li>
+      
+        <span class='name'>opts</span>
+      
+      
+        <span class='type'>(<tt>Hash</tt>)</span>
+      
+      
+        <em class="default">(defaults to: <tt>{}</tt>)</em>
+      
+      
+        &mdash;
+        <div class='inline'>
+<p>({}) Configuration options.</p>
+</div>
+      
+    </li>
+  
+</ul>
+
+
+  <p class="tag_title">See Also:</p>
+  <ul class="see">
+    
+      <li><span class='object_link'><a href="ContextIntegrator.html#initialize_hook_core_context_integrator-instance_method" title="AeEasy::Core::Plugin::ContextIntegrator#initialize_hook_core_context_integrator (method)">ContextIntegrator#initialize_hook_core_context_integrator</a></span></li>
+    
+  </ul>
+
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+13
+14
+15</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/ae_easy/core/plugin/finisher.rb', line 13</span>
+
+<span class='kw'>def</span> <span class='id identifier rubyid_initialize'>initialize</span> <span class='id identifier rubyid_opts'>opts</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id identifier rubyid_initialize_hooks'>initialize_hooks</span> <span class='id identifier rubyid_opts'>opts</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
 
 </div>
 
       <div id="footer">
-  Generated on Fri Sep 27 02:01:31 2019 by
+  Generated on Fri Sep 27 02:01:30 2019 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.9.20 (ruby-2.5.3).
 </div>

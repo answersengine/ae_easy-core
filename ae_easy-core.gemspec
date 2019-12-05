@@ -1,21 +1,17 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "ae_easy/core/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "ae_easy-core"
-  spec.version       = AeEasy::Core::VERSION
+  spec.version       = "0.2.1"
   spec.authors       = ["Eduardo Rosales"]
   spec.email         = ["eduardo@datahen.com"]
 
-  spec.summary       = %q{AnswersEngine Easy toolkit core module}
-  spec.description   = %q{AnswersEngine Easy toolkit core module to support other complex modules.}
-  spec.homepage      = "https://answersengine.com"
+  spec.summary       = %q{(Deprecated: Use dh_easy-core gem instead.) Compatibility alias for DataHen Easy toolkit core module}
+  spec.description   = %q{(Deprecated: Use dh_easy-core gem instead.) Compatibility alias for DataHen Easy toolkit core module to support other complex modules.}
+  spec.homepage      = "https://datahen.com"
   spec.license       = "MIT"
-
-  # spec.cert_chain  = ['certs/ae_easy.pem']
-  # spec.signing_key = File.expand_path("~/.ssh/gems/gem-private_ae_easy.pem") if $0 =~ /gem\z/
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
   # to allow pushing to a single host or delete this section to allow pushing to any host.
@@ -38,13 +34,10 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
   spec.required_ruby_version = '>= 2.2.2'
 
-  spec.add_dependency 'answersengine', '~> 0.9'
-  spec.add_dependency 'faker', '~> 1'
+  spec.add_dependency 'dh_easy-core', '>= 0'
+  spec.add_dependency 'answersengine', '>= 0.10.2'
   spec.add_development_dependency 'bundler', '>= 1'
   spec.add_development_dependency 'rake', '~> 10'
   spec.add_development_dependency 'minitest', '~> 5'
-  spec.add_development_dependency 'simplecov', '~> 0'
-  spec.add_development_dependency 'simplecov-console', '~> 0'
-  spec.add_development_dependency 'timecop', '~> 0'
   spec.add_development_dependency 'byebug', '>= 0'
 end

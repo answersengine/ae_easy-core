@@ -5,12 +5,16 @@
 # AeEasy core module
 ## Description
 
-AeEasy core is part of AeEasy gem collection and allow advance AnswersEngine features possible by function as a base for other gems.
+AeEasy core is part of AeEasy gem collection and an alias to [dh_easy-core](https://github.com/DataHenOfficial/dh_easy-core/) gem. It provides a compatibility layer for advance DataHen features possible by function as a base for other gems.
 
 Install gem:
-```gem install 'ae_easy-core'```
+```ruby
+gem install 'ae_easy-core'
+```
 
 Require gem:
-```require 'ae_easy/core'```
+```ruby
+require 'ae_easy/core'
+```
 
-Documentation can be found [here](http://rubydoc.org/gems/ae_easy-core/frames).
+See [dh_easy-core](https://github.com/DataHenOfficial/dh_easy-core/) gem for documentation.
